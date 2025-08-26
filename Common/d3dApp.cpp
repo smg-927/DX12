@@ -189,20 +189,28 @@ void D3DApp::OnResize()
     optClear.Format = mDepthStencilFormat;
     optClear.DepthStencil.Depth = 1.0f;
     optClear.DepthStencil.Stencil = 0;
-    ThrowIfFailed(md3dDevice->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
+
+	ThrowIfFailed(md3dDevice->CreateCommittedResource(
+		&heapProps,
 		D3D12_HEAP_FLAG_NONE,
-        &depthStencilDesc,
+		&depthStencilDesc,
 		D3D12_RESOURCE_STATE_COMMON,
-        &optClear,
-        IID_PPV_ARGS(mDepthStencilBuffer.GetAddressOf())));
+		&optClear,
+		IID_PPV_ARGS(mDepthStencilBuffer.GetAddressOf())));
 
     // Create descriptor to mip level 0 of entire resource using the format of the resource.
     md3dDevice->CreateDepthStencilView(mDepthStencilBuffer.Get(), nullptr, DepthStencilView());
 
     // Transition the resource from its initial state to be used as a depth buffer.
-	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mDepthStencilBuffer.Get(),
-		D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+
+	CD3DX12_RESOURCE_BARRIER barrier =
+		CD3DX12_RESOURCE_BARRIER::Transition(
+			mDepthStencilBuffer.Get(),
+			D3D12_RESOURCE_STATE_COMMON,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+	mCommandList->ResourceBarrier(1, &barrier);
 	
     // Execute the resize commands.
     ThrowIfFailed(mCommandList->Close());
@@ -530,16 +538,19 @@ void D3DApp::FlushCommandQueue()
     ThrowIfFailed(mCommandQueue->Signal(mFence.Get(), mCurrentFence));
 
 	// Wait until the GPU has completed commands up to this fence point.
-    if(mFence->GetCompletedValue() < mCurrentFence)
+	if (mFence->GetCompletedValue() < mCurrentFence)
 	{
-		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		// CreateEvent: (LPSECURITY_ATTRIBUTES, BOOL bManualReset, BOOL bInitialState, LPCWSTR lpName)
+		HANDLE eventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		if (eventHandle == nullptr)
+			ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
 
-        // Fire event when GPU hits current fence.  
-        ThrowIfFailed(mFence->SetEventOnCompletion(mCurrentFence, eventHandle));
+		// Fire event when GPU hits current fence.  
+		ThrowIfFailed(mFence->SetEventOnCompletion(mCurrentFence, eventHandle));
 
-        // Wait until the GPU hits current fence event is fired.
+		// Wait until the GPU hits current fence event is fired.
 		WaitForSingleObject(eventHandle, INFINITE);
-        CloseHandle(eventHandle);
+		CloseHandle(eventHandle);
 	}
 }
 
