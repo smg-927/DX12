@@ -25,6 +25,9 @@ struct Vertex
 struct ObjectConstants
 {
     XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+    XMFLOAT4 gPulseColor = {0.4,0.8,0.7,1.0};
+    FLOAT gTime = 0;
+    XMFLOAT3 _pad;
 };
 
 class BoxApp : public D3DApp
@@ -169,6 +172,7 @@ void BoxApp::Update(const GameTimer& gt)
     // Update the constant buffer with the latest worldViewProj matrix.
     ObjectConstants objConstants;
     XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+    objConstants.gTime = gt.TotalTime();
     mObjectCB->CopyData(0, objConstants);
 }
 
@@ -183,15 +187,7 @@ void BoxApp::Draw(const GameTimer& gt)
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), mPSO.Get()));
 
     mCommandList->RSSetViewports(1, &mScreenViewport);
-
-
-    // scissor ¹Ý¿µ
-    int scW = mClientWidth / 2;
-    int scH = mClientHeight / 2;
-    int left = (mClientWidth - scW) / 2;
-    int top = (mClientHeight - scH) / 2;
-    D3D12_RECT scissor = { left, top, left + scW, top + scH };
-    mCommandList->RSSetScissorRects(1, &scissor);
+    mCommandList->RSSetScissorRects(1, &mScissorRect);
 
     // Indicate a state transition on the resource usage.
     CD3DX12_RESOURCE_BARRIER barrier =
@@ -373,8 +369,8 @@ void BoxApp::BuildShadersAndInputLayout()
 {
     HRESULT hr = S_OK;
 
-    mvsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
-    mpsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
+    mvsByteCode = d3dUtil::CompileShader(L"..\\DX12_Chap6_16\\Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
+    mpsByteCode = d3dUtil::CompileShader(L"..\\DX12_Chap6_16\\Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
 
     mInputLayout =
     {
@@ -471,8 +467,6 @@ void BoxApp::BuildPSO()
         reinterpret_cast<BYTE*>(mpsByteCode->GetBufferPointer()),
         mpsByteCode->GetBufferSize()
     };
-
-
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
@@ -483,7 +477,5 @@ void BoxApp::BuildPSO()
     psoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
     psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
     psoDesc.DSVFormat = mDepthStencilFormat;
-
-    
     ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }

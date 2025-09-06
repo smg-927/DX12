@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -18,32 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\Common\Camera.cpp" />
-    <ClCompile Include="..\..\..\Common\d3dApp.cpp" />
-    <ClCompile Include="..\..\..\Common\d3dUtil.cpp" />
-    <ClCompile Include="..\..\..\Common\DDSTextureLoader.cpp" />
-    <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
-    <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
-    <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
-    <ClCompile Include="..\DX12_Chap6_16\Chap6_16.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\Common\Camera.h" />
-    <ClInclude Include="..\..\..\Common\d3dApp.h" />
-    <ClInclude Include="..\..\..\Common\d3dUtil.h" />
-    <ClInclude Include="..\..\..\Common\d3dx12.h" />
-    <ClInclude Include="..\..\..\Common\DDSTextureLoader.h" />
-    <ClInclude Include="..\..\..\Common\GameTimer.h" />
-    <ClInclude Include="..\..\..\Common\GeometryGenerator.h" />
-    <ClInclude Include="..\..\..\Common\MathHelper.h" />
-    <ClInclude Include="..\..\..\Common\UploadBuffer.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c4627c4d-c894-49be-85e4-67cf5ce52294}</ProjectGuid>
-    <RootNamespace>DX12Chap62</RootNamespace>
+    <ProjectGuid>{a83d815d-8d40-48e8-a9bc-e10f3eba153a}</ProjectGuid>
+    <RootNamespace>Chap7ShapesDemo</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -144,6 +123,29 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Common\Camera.h" />
+    <ClInclude Include="..\..\..\Common\d3dApp.h" />
+    <ClInclude Include="..\..\..\Common\d3dUtil.h" />
+    <ClInclude Include="..\..\..\Common\d3dx12.h" />
+    <ClInclude Include="..\..\..\Common\DDSTextureLoader.h" />
+    <ClInclude Include="..\..\..\Common\GameTimer.h" />
+    <ClInclude Include="..\..\..\Common\GeometryGenerator.h" />
+    <ClInclude Include="..\..\..\Common\MathHelper.h" />
+    <ClInclude Include="..\..\..\Common\UploadBuffer.h" />
+    <ClInclude Include="FrameResource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Common\Camera.cpp" />
+    <ClCompile Include="..\..\..\Common\d3dApp.cpp" />
+    <ClCompile Include="..\..\..\Common\d3dUtil.cpp" />
+    <ClCompile Include="..\..\..\Common\DDSTextureLoader.cpp" />
+    <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
+    <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
+    <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="..\Chap7_2\Chap7_2.cpp" />
+    <ClCompile Include="FrameResource.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

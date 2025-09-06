@@ -22,9 +22,11 @@ struct Vertex
     XMFLOAT4 Color;
 };
 
+
 struct ObjectConstants
 {
     XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+    XMFLOAT4 gTint; // 16 bytes
 };
 
 class BoxApp : public D3DApp
@@ -166,9 +168,27 @@ void BoxApp::Update(const GameTimer& gt)
     XMMATRIX proj = XMLoadFloat4x4(&mProj);
     XMMATRIX worldViewProj = world * view * proj;
 
+    // 애니메이션 세팅
+    float period = 3.0f; // 색 변환 주기(초)
+    float time = fmodf((float)gt.TotalTime(), period) / period; // 0..1
+
+    // smoothstep easing (Hermite)
+    float e = time * time * (3.0f - 2.0f * time);
+
+    // 색 범위: 예시로 파랑 -> 빨강
+    DirectX::XMFLOAT4 startCol = { 0.2f, 0.4f, 1.0f, 1.0f };
+    DirectX::XMFLOAT4 endCol = { 1.0f, 0.2f, 0.2f, 1.0f };
+
+    DirectX::XMFLOAT4 tint;
+    tint.x = startCol.x + (endCol.x - startCol.x) * e;
+    tint.y = startCol.y + (endCol.y - startCol.y) * e;
+    tint.z = startCol.z + (endCol.z - startCol.z) * e;
+    tint.w = 1.0f;
+
     // Update the constant buffer with the latest worldViewProj matrix.
     ObjectConstants objConstants;
     XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+    objConstants.gTint = tint;
     mObjectCB->CopyData(0, objConstants);
 }
 
@@ -183,15 +203,7 @@ void BoxApp::Draw(const GameTimer& gt)
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), mPSO.Get()));
 
     mCommandList->RSSetViewports(1, &mScreenViewport);
-
-
-    // scissor 반영
-    int scW = mClientWidth / 2;
-    int scH = mClientHeight / 2;
-    int left = (mClientWidth - scW) / 2;
-    int top = (mClientHeight - scH) / 2;
-    D3D12_RECT scissor = { left, top, left + scW, top + scH };
-    mCommandList->RSSetScissorRects(1, &scissor);
+    mCommandList->RSSetScissorRects(1, &mScissorRect);
 
     // Indicate a state transition on the resource usage.
     CD3DX12_RESOURCE_BARRIER barrier =
@@ -373,8 +385,8 @@ void BoxApp::BuildShadersAndInputLayout()
 {
     HRESULT hr = S_OK;
 
-    mvsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
-    mpsByteCode = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
+    mvsByteCode = d3dUtil::CompileShader(L"..\\DX12_Chap6_14\\Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
+    mpsByteCode = d3dUtil::CompileShader(L"..\\DX12_Chap6_14\\Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
 
     mInputLayout =
     {
@@ -471,8 +483,6 @@ void BoxApp::BuildPSO()
         reinterpret_cast<BYTE*>(mpsByteCode->GetBufferPointer()),
         mpsByteCode->GetBufferSize()
     };
-
-
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
@@ -483,7 +493,5 @@ void BoxApp::BuildPSO()
     psoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
     psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
     psoDesc.DSVFormat = mDepthStencilFormat;
-
-    
     ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
