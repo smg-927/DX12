@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a83d815d-8d40-48e8-a9bc-e10f3eba153a}</ProjectGuid>
-    <RootNamespace>Chap7ShapesDemo</RootNamespace>
+    <ProjectGuid>{7db2ef8e-e546-4ac8-a7a9-3550fd639599}</ProjectGuid>
+    <RootNamespace>Chap8LitColumns</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -124,6 +124,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Common\Camera.cpp" />
+    <ClCompile Include="..\..\..\Common\d3dApp.cpp" />
+    <ClCompile Include="..\..\..\Common\d3dUtil.cpp" />
+    <ClCompile Include="..\..\..\Common\DDSTextureLoader.cpp" />
+    <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
+    <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
+    <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="FrameResource.cpp" />
+    <ClCompile Include="LitColumnsApp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="..\..\..\Common\Camera.h" />
     <ClInclude Include="..\..\..\Common\d3dApp.h" />
     <ClInclude Include="..\..\..\Common\d3dUtil.h" />
@@ -134,17 +145,6 @@
     <ClInclude Include="..\..\..\Common\MathHelper.h" />
     <ClInclude Include="..\..\..\Common\UploadBuffer.h" />
     <ClInclude Include="FrameResource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\Common\Camera.cpp" />
-    <ClCompile Include="..\..\..\Common\d3dApp.cpp" />
-    <ClCompile Include="..\..\..\Common\d3dUtil.cpp" />
-    <ClCompile Include="..\..\..\Common\DDSTextureLoader.cpp" />
-    <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
-    <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
-    <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
-    <ClCompile Include="..\Chap7_3\Chap7_3.cpp" />
-    <ClCompile Include="FrameResource.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

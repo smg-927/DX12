@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a83d815d-8d40-48e8-a9bc-e10f3eba153a}</ProjectGuid>
-    <RootNamespace>Chap7ShapesDemo</RootNamespace>
+    <ProjectGuid>{56012af9-482d-47fd-a022-94e895bce0c1}</ProjectGuid>
+    <RootNamespace>Chap8LitWaves</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PublicIncludeDirectories>$(PublicIncludeDirectories)</PublicIncludeDirectories>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -124,6 +127,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Common\Camera.cpp" />
+    <ClCompile Include="..\..\..\Common\d3dApp.cpp" />
+    <ClCompile Include="..\..\..\Common\d3dUtil.cpp" />
+    <ClCompile Include="..\..\..\Common\DDSTextureLoader.cpp" />
+    <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
+    <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
+    <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="FrameResource.cpp" />
+    <ClCompile Include="LitWavesApp.cpp" />
+    <ClCompile Include="Waves.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="..\..\..\Common\Camera.h" />
     <ClInclude Include="..\..\..\Common\d3dApp.h" />
     <ClInclude Include="..\..\..\Common\d3dUtil.h" />
@@ -134,17 +149,7 @@
     <ClInclude Include="..\..\..\Common\MathHelper.h" />
     <ClInclude Include="..\..\..\Common\UploadBuffer.h" />
     <ClInclude Include="FrameResource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\Common\Camera.cpp" />
-    <ClCompile Include="..\..\..\Common\d3dApp.cpp" />
-    <ClCompile Include="..\..\..\Common\d3dUtil.cpp" />
-    <ClCompile Include="..\..\..\Common\DDSTextureLoader.cpp" />
-    <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
-    <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
-    <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
-    <ClCompile Include="..\Chap7_3\Chap7_3.cpp" />
-    <ClCompile Include="FrameResource.cpp" />
+    <ClInclude Include="Waves.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
