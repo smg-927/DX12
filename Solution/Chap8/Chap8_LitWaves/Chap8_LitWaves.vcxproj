@@ -134,8 +134,8 @@
     <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="..\Chap8_6\Chap8_6.cpp" />
     <ClCompile Include="FrameResource.cpp" />
-    <ClCompile Include="LitWavesApp.cpp" />
     <ClCompile Include="Waves.cpp" />
   </ItemGroup>
   <ItemGroup>
