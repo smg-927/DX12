@@ -131,7 +131,7 @@
     <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
-    <ClCompile Include="..\Chap8_5\Chap8_5.cpp" />
+    <ClCompile Include="..\Chap9_6\Chap9_6.cpp" />
     <ClCompile Include="FrameResource.cpp" />
   </ItemGroup>
   <ItemGroup>

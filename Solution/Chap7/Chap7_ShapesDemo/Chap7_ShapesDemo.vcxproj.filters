@@ -71,7 +71,7 @@
     <ClCompile Include="FrameResource.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\Chap7_3\Chap7_3.cpp">
+    <ClCompile Include="ShapesApp.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
