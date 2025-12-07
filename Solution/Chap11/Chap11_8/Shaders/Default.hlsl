@@ -93,6 +93,11 @@ struct VertexOut
 	float2 TexC    : TEXCOORD;
 };
 
+struct PixelOut
+{
+    float4 color : SV_Target;
+    float depth : SV_Depth;
+};
 VertexOut VS(VertexIn vin)
 {
 	VertexOut vout = (VertexOut)0.0f;
@@ -116,6 +121,8 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
+    PixelOut pout;
+
     float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC) * gDiffuseAlbedo;
 	
 #ifdef ALPHA_TEST

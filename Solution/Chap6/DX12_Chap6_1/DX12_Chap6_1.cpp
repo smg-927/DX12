@@ -19,5 +19,6 @@ int main()
         { "TEXCOORD",  1, DXGI_FORMAT_R32G32_FLOAT,              0,         44,                D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "COLOR",     0, DXGI_FORMAT_R8G8B8A8_UNORM,            0,         52,                D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
     };
+
     const UINT NumElements = _countof(InputLayout);
 }

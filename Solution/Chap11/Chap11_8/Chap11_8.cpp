@@ -199,6 +199,7 @@ bool BlendApp::Initialize()
 	LoadTextures();
     BuildRootSignature();
 	BuildDescriptorHeaps();
+
     BuildShadersAndInputLayout();
     BuildLandGeometry();
     BuildWavesGeometry();
@@ -621,6 +622,7 @@ void BlendApp::BuildDescriptorHeaps()
 	srvHeapDesc.NumDescriptors = 3;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mSrvDescriptorHeap)));
 
 	//
@@ -863,7 +865,24 @@ void BlendApp::BuildPSOs()
 	};
 	opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+
+	D3D12_DEPTH_STENCIL_DESC stencildesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	stencildesc.DepthEnable = FALSE;                     // 시각화 단계에서는 깊이 불필요
+	stencildesc.StencilEnable = TRUE;
+	stencildesc.StencilReadMask = 0xFF;
+	stencildesc.StencilWriteMask = 0x00;
+
+	D3D12_DEPTH_STENCILOP_DESC keep = {};
+	keep.StencilFunc = D3D12_COMPARISON_FUNC_EQUAL; // 참조값과 같은 픽셀만 통과
+	keep.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	keep.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	keep.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+
+	stencildesc.FrontFace = keep;
+	stencildesc.BackFace = keep;
+	
+	opaquePsoDesc.DepthStencilState = stencildesc;
+
 	opaquePsoDesc.SampleMask = UINT_MAX;
 	opaquePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	opaquePsoDesc.NumRenderTargets = 1;
@@ -1029,6 +1048,7 @@ void BlendApp::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::ve
         cmdList->SetGraphicsRootConstantBufferView(3, matCBAddress);
 
         cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+		
     }
 }
 

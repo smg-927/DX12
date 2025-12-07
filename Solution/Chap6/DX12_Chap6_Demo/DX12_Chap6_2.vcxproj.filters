@@ -36,7 +36,7 @@
     <ClCompile Include="..\..\..\Common\d3dUtil.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\DX12_Chap6_16\Chap6_16.cpp">
+    <ClCompile Include="..\DX12_Chap6_13\Chap6_13.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -143,8 +143,8 @@
     <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="..\Chap7_1\Chap7_1.cpp" />
     <ClCompile Include="FrameResource.cpp" />
-    <ClCompile Include="ShapesApp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
