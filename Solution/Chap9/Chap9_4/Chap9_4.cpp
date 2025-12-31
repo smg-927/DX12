@@ -365,7 +365,23 @@ void CrateApp::UpdateCamera(const GameTimer& gt)
 
 void CrateApp::AnimateMaterials(const GameTimer& gt)
 {
-	
+	auto flareMat = mMaterials["woodCrate"].get();
+
+	static float angle = 0.0f;
+	angle += 0.5f * gt.DeltaTime(); // 회전 속도
+
+	using namespace DirectX;
+
+	XMMATRIX T1 = XMMatrixTranslation(-0.5f, -0.5f, 0.0f);
+	XMMATRIX R = XMMatrixRotationZ(angle);
+	XMMATRIX T2 = XMMatrixTranslation(0.5f, 0.5f, 0.0f);
+
+	XMMATRIX texTransform = T1 * R * T2;
+
+	XMStoreFloat4x4(&flareMat->MatTransform, texTransform);
+
+	// Material has changed, so need to update cbuffer.
+	flareMat->NumFramesDirty = gNumFrameResources;
 }
 
 void CrateApp::UpdateObjectCBs(const GameTimer& gt)
@@ -462,7 +478,7 @@ void CrateApp::LoadTextures()
 {
 	auto woodCrateTex = std::make_unique<Texture>();
 	woodCrateTex->Name = "woodCrateTex";
-	woodCrateTex->Filename = L"../../../Textures/WoodCrate01.dds";
+	woodCrateTex->Filename = L"../../../Exercise_Media/flarealpha.dds";
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
 		mCommandList.Get(), woodCrateTex->Filename.c_str(),
 		woodCrateTex->Resource, woodCrateTex->UploadHeap));
@@ -471,7 +487,7 @@ void CrateApp::LoadTextures()
 
 	auto bricksTex = std::make_unique<Texture>();
 	bricksTex->Name = "bricksTex";
-	bricksTex->Filename = L"../../../Textures/bricks3.dds";
+	bricksTex->Filename = L"../../../Exercise_Media/flare.dds";
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
 		mCommandList.Get(), bricksTex->Filename.c_str(),
 		bricksTex->Resource, bricksTex->UploadHeap));
@@ -582,8 +598,8 @@ void CrateApp::BuildDescriptorHeaps()
 
 void CrateApp::BuildShadersAndInputLayout()
 {
-	mShaders["standardVS"] = d3dUtil::CompileShader(L"..\\Chap9_4\\Shaders\\Default.hlsl", nullptr, "VS", "vs_5_0");
-	mShaders["opaquePS"] = d3dUtil::CompileShader(L"..\\Chap9_4\\Shaders\\Default.hlsl", nullptr, "PS", "ps_5_0");
+	mShaders["standardVS"] = d3dUtil::CompileShader(L"..\\Chap9_3\\Shaders\\Default.hlsl", nullptr, "VS", "vs_5_0");
+	mShaders["opaquePS"] = d3dUtil::CompileShader(L"..\\Chap9_3\\Shaders\\Default.hlsl", nullptr, "PS", "ps_5_0");
 	
     mInputLayout =
     {

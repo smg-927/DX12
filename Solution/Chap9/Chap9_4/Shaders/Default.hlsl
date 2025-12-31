@@ -22,7 +22,7 @@
 
 Texture2D    gDiffuseMap1 : register(t0);
 Texture2D    gDiffuseMap2 : register(t1);
-SamplerState gsamLinear  : register(s2);
+SamplerState gsamLinear  : register(s0);
 
 
 // Constant data that varies per frame.
@@ -79,42 +79,32 @@ struct VertexOut
     float3 PosW    : POSITION;
     float3 NormalW : NORMAL;
 	float2 TexC    : TEXCOORD;
-    float2 TexCRot : TEXCOORD1;
 };
 
 VertexOut VS(VertexIn vin)
 {
-    VertexOut vout = (VertexOut)0;
-
+	VertexOut vout = (VertexOut)0.0f;
+	
+    // Transform to world space.
     float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
     vout.PosW = posW.xyz;
 
+    // Assumes nonuniform scaling; otherwise, need to use inverse-transpose of world matrix.
     vout.NormalW = mul(vin.NormalL, (float3x3)gWorld);
 
+    // Transform to homogeneous clip space.
     vout.PosH = mul(posW, gViewProj);
-
+	
+	// Output vertex attributes for interpolation across triangle.
     float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
-    float2 uv = texC.xy;
-
-    const float rotateSpeed = 0.5f;
-    float angle = gTotalTime * rotateSpeed;
-    float s = sin(angle), c = cos(angle);
-    float2x2 R = float2x2(c, -s, s, c);
-    float2 uvRot = mul(uv - 0.5f, R) + 0.5f;
-
-    vout.TexC = mul(float4(uv, 0, 1), gMatTransform).xy;
-    vout.TexCRot = mul(float4(uvRot, 0, 1), gMatTransform).xy;
+    vout.TexC = mul(texC, gMatTransform).xy;
 
     return vout;
 }
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    float4 cRot = gDiffuseMap1.Sample(gsamLinear, pin.TexCRot);
-    float4 cFix = gDiffuseMap2.Sample(gsamLinear, pin.TexC);
-    float4 diffuseAlbedo = (cRot * 0.5f + cFix * 0.5f) * gDiffuseAlbedo;
-
-    //float4 diffuseAlbedo = (gDiffuseMap1.Sample(gsamLinear, pin.TexC) * 0.5f + gDiffuseMap2.Sample(gsamLinear, pin.TexC) * 0.5f)* gDiffuseAlbedo;
+    float4 diffuseAlbedo = (gDiffuseMap1.Sample(gsamLinear, pin.TexC) * gDiffuseMap2.Sample(gsamLinear, pin.TexC)) * gDiffuseAlbedo;
 
     // Interpolating normal can unnormalize it, so renormalize it.
     pin.NormalW = normalize(pin.NormalW);

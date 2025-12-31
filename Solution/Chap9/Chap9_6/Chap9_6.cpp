@@ -191,7 +191,7 @@ void LitColumnsApp::Update(const GameTimer& gt) {
 	UpdateCamera(gt);
 
 	//Cycle through the circular frame resource array.
-	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) & gNumFrameResources;
+	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
 	mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
 
 	// Has the GPU finished processing the commands of the current frame resource?
@@ -534,8 +534,8 @@ void LitColumnsApp::BuildShadersAndInputLayout() {
 		NULL, NULL
 	};
 
-	mShaders["standardVS"] = d3dUtil::CompileShader(L"..\\Chap9_6\\Shaders\\Defalut.hlsl", nullptr, "VS", "vs_5_0");
-	mShaders["opaquePS"] = d3dUtil::CompileShader(L"..\\Chap9_6\\Shaders\\Defalut.hlsl", nullptr, "pS", "Ps_5_0");
+	mShaders["standardVS"] = d3dUtil::CompileShader(L"..\\..\\Chap9\\Chap9_6\\Shaders\\Default.hlsl", nullptr, "VS", "vs_5_0");
+	mShaders["opaquePS"] = d3dUtil::CompileShader(L"..\\..\\Chap9\\Chap9_6\\Shaders\\Default.hlsl", nullptr, "PS", "ps_5_0");
 
 	mInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},

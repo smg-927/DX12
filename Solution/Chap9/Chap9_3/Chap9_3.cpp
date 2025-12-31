@@ -462,7 +462,7 @@ void CrateApp::LoadTextures()
 {
 	auto woodCrateTex = std::make_unique<Texture>();
 	woodCrateTex->Name = "woodCrateTex";
-	woodCrateTex->Filename = L"../../../Textures/WoodCrate01.dds";
+	woodCrateTex->Filename = L"../../../Exercise_Media/flarealpha.dds";
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
 		mCommandList.Get(), woodCrateTex->Filename.c_str(),
 		woodCrateTex->Resource, woodCrateTex->UploadHeap));
@@ -471,7 +471,7 @@ void CrateApp::LoadTextures()
 
 	auto bricksTex = std::make_unique<Texture>();
 	bricksTex->Name = "bricksTex";
-	bricksTex->Filename = L"../../../Textures/bricks3.dds";
+	bricksTex->Filename = L"../../../Exercise_Media/flare.dds";
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
 		mCommandList.Get(), bricksTex->Filename.c_str(),
 		bricksTex->Resource, bricksTex->UploadHeap));
