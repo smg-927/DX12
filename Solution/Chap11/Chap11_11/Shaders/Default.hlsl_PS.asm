@@ -99,47 +99,47 @@
 //   v3.x <- pin.TexC.x; v3.y <- pin.TexC.y; 
 //   o0.x <- <PS return value>.x; o0.y <- <PS return value>.y; o0.z <- <PS return value>.z; o0.w <- <PS return value>.w
 //
-#line 162 "C:\cg\DX12\Solution\Chap11\Chap11_8\Shaders\Default.hlsl"
+#line 117 "C:\cg\DX12\Solution\Chap11\Chap11_11\Shaders\Default.hlsl"
    0: sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.xyzw, s4
    1: mul r0.xyzw, r0.xyzw, cb2[0].xyzw  // r0.x <- diffuseAlbedo.x; r0.y <- diffuseAlbedo.y; r0.z <- diffuseAlbedo.z; r0.w <- diffuseAlbedo.w
 
-#line 168
+#line 123
    2: mov r1.x, l(-0.100000)
    3: add r1.x, r0.w, r1.x
    4: lt r1.x, r1.x, l(0.000000)
    5: and r1.x, r1.x, l(-1)
    6: discard_nz r1.x
 
-#line 172
+#line 127
    7: dp3 r1.x, v2.xyzx, v2.xyzx
    8: rsq r1.x, r1.x
    9: mul r1.xyz, r1.xxxx, v2.xyzx  // r1.x <- pin.NormalW.x; r1.y <- pin.NormalW.y; r1.z <- pin.NormalW.z
 
-#line 175
+#line 130
   10: mov r2.xyz, -v1.xyzx
   11: add r2.xyz, r2.xyzx, cb1[24].xyzx  // r2.x <- toEyeW.x; r2.y <- toEyeW.y; r2.z <- toEyeW.z
 
-#line 176
+#line 131
   12: dp3 r1.w, r2.xyzx, r2.xyzx
   13: sqrt r1.w, r1.w  // r1.w <- distToEye
 
-#line 177
+#line 132
   14: div r2.xyz, r2.xyzx, r1.wwww
 
-#line 180
+#line 135
   15: mul r3.xyz, r0.xyzx, cb1[27].xyzx  // r3.x <- ambient.x; r3.y <- ambient.y; r3.z <- ambient.z
 
-#line 182
+#line 137
   16: mov r2.w, -cb2[1].w
   17: add r4.w, r2.w, l(1.000000)  // r4.w <- shininess
 
-#line 183
+#line 138
   18: mov r5.xyz, r0.xyzx  // r5.x <- mat.DiffuseAlbedo.x; r5.y <- mat.DiffuseAlbedo.y; r5.z <- mat.DiffuseAlbedo.z
   19: mov r5.w, cb2[1].x  // r5.w <- mat.FresnelR0.x
   20: mov r4.yz, cb2[1].yyzy  // r4.y <- mat.FresnelR0.y; r4.z <- mat.FresnelR0.z
   21: mov r4.w, r4.w  // r4.w <- mat.Shininess
 
-#line 185
+#line 140
   22: nop 
   23: mov x0[0].xyz, cb1[30].xyzx
   24: mov x0[2].xyz, cb1[31].xyzx
@@ -274,29 +274,29 @@
 #line 167
  108: mov r6.xyz, r6.xyzx  // r6.x <- <ComputeLighting return value>.x; r6.y <- <ComputeLighting return value>.y; r6.z <- <ComputeLighting return value>.z
 
-#line 185 "C:\cg\DX12\Solution\Chap11\Chap11_8\Shaders\Default.hlsl"
+#line 140 "C:\cg\DX12\Solution\Chap11\Chap11_11\Shaders\Default.hlsl"
  109: mov r6.xyz, r6.xyzx  // r6.x <- directLight.x; r6.y <- directLight.y; r6.z <- directLight.z
 
-#line 188
+#line 143
  110: add r0.xyz, r3.xyzx, r6.xyzx  // r0.x <- litColor.x; r0.y <- litColor.y; r0.z <- litColor.z
 
-#line 191
+#line 146
  111: mov r1.x, -cb1[29].x
  112: add r1.x, r1.x, r1.w
  113: div r1.x, r1.x, cb1[29].y
  114: max r1.x, r1.x, l(0.000000)
  115: min r1.x, r1.x, l(1.000000)  // r1.x <- fogAmount
 
-#line 192
+#line 147
  116: mov r1.yzw, -r0.xxyz
  117: add r1.yzw, r1.yyzw, cb1[28].xxyz
  118: mul r1.xyz, r1.yzwy, r1.xxxx
  119: add r0.xyz, r0.xyzx, r1.xyzx
 
-#line 196
+#line 151
  120: mov r0.w, r0.w  // r0.w <- litColor.w
 
-#line 198
+#line 153
  121: mov o0.xyz, r0.xyzx
  122: mov o0.w, r0.w
  123: ret 

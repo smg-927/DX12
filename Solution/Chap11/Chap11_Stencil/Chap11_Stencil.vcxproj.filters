@@ -39,14 +39,11 @@
     <ClCompile Include="..\..\..\Common\MathHelper.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\Chap11_6\Chap11_6.cpp">
+    <ClCompile Include="..\Chap11_5\Chap11_5.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FrameResource.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Common\Camera.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -54,6 +51,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Common\d3dUtil.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\d3dx12.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Common\DDSTextureLoader.h">

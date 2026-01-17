@@ -37,7 +37,7 @@ cbuffer cbPerObject : register(b0)
 	float4x4 gTexTransform;
 };
 
-// Constant data that varies per pass.
+// Constant data that varies per material.
 cbuffer cbPass : register(b1)
 {
     float4x4 gView;
@@ -56,8 +56,6 @@ cbuffer cbPass : register(b1)
     float gDeltaTime;
     float4 gAmbientLight;
 
-	// Allow application to change fog parameters once per frame.
-	// For example, we may only use fog for certain times of day.
 	float4 gFogColor;
 	float gFogStart;
 	float gFogRange;
@@ -78,17 +76,6 @@ cbuffer cbMaterial : register(b2)
 	float4x4 gMatTransform;
 };
 
-cbuffer cbRootConstants : register(b3)
-{
-    float4 gComplexityColor;
-};
-
-struct VertexOut_Visualize
-{
-    float4 PosH : SV_POSITION;
-    float2 TexC : TEXCOORD;
-};
-
 struct VertexIn
 {
 	float3 PosL    : POSITION;
@@ -103,36 +90,6 @@ struct VertexOut
     float3 NormalW : NORMAL;
 	float2 TexC    : TEXCOORD;
 };
-
-struct PixelOut
-{
-    float4 color : SV_Target;
-    float depth : SV_Depth;
-};
-
-// ----------------------------------------------------------------
-// 1. 시각화용 정점 셰이더 (Bufferless Fullscreen Quad)
-// ----------------------------------------------------------------
-VertexOut_Visualize VisualizeVS(uint vid : SV_VertexID)
-{
-    VertexOut_Visualize vout;
-
-    // SV_VertexID를 이용한 풀스크린 사각형 좌표 생성 (정점 버퍼 필요 없음)
-    vout.TexC = float2((vid << 1) & 2, vid & 2);
-    vout.PosH = float4(vout.TexC * float2(2.0f, -2.0f) + float2(-1.0f, 1.0f), 0.0f, 1.0f);
-
-    return vout;
-}
-
-// ----------------------------------------------------------------
-// 2. 시각화용 픽셀 셰이더
-// ----------------------------------------------------------------
-float4 VisualizePS(VertexOut_Visualize pin) : SV_Target
-{
-    // C++의 UpdateColorConstant에서 보낸 색상을 그대로 출력
-    return gComplexityColor;
-}
-
 
 VertexOut VS(VertexIn vin)
 {
@@ -157,8 +114,6 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    PixelOut pout;
-
     float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC) * gDiffuseAlbedo;
 	
 #ifdef ALPHA_TEST

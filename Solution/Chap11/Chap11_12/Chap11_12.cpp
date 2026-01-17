@@ -14,7 +14,6 @@ using namespace DirectX::PackedVector;
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
-
 const int gNumFrameResources = 3;
 
 // Lightweight structure stores parameters to draw a shape.  This will
@@ -23,10 +22,10 @@ struct RenderItem
 {
 	RenderItem() = default;
 
-	// World matrix of the shape that describes the object's local space
-	// relative to the world space, which defines the position, orientation,
-	// and scale of the object in the world.
-	XMFLOAT4X4 World = MathHelper::Identity4x4();
+    // World matrix of the shape that describes the object's local space
+    // relative to the world space, which defines the position, orientation,
+    // and scale of the object in the world.
+    XMFLOAT4X4 World = MathHelper::Identity4x4();
 
 	XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
 
@@ -42,47 +41,45 @@ struct RenderItem
 	Material* Mat = nullptr;
 	MeshGeometry* Geo = nullptr;
 
-	// Primitive topology.
-	D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    // Primitive topology.
+    D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	// DrawIndexedInstanced parameters.
-	UINT IndexCount = 0;
-	UINT StartIndexLocation = 0;
-	int BaseVertexLocation = 0;
+    // DrawIndexedInstanced parameters.
+    UINT IndexCount = 0;
+    UINT StartIndexLocation = 0;
+    int BaseVertexLocation = 0;
 };
 
 enum class RenderLayer : int
 {
 	Opaque = 0,
-	Mirrors,
+	Mirrors ,
 	Reflected,
 	Transparent,
 	Shadow,
-	wall,
-	skull,
 	Count
 };
 
 class StencilApp : public D3DApp
 {
 public:
-	StencilApp(HINSTANCE hInstance);
-	StencilApp(const StencilApp& rhs) = delete;
-	StencilApp& operator=(const StencilApp& rhs) = delete;
-	~StencilApp();
+    StencilApp(HINSTANCE hInstance);
+    StencilApp(const StencilApp& rhs) = delete;
+    StencilApp& operator=(const StencilApp& rhs) = delete;
+    ~StencilApp();
 
-	virtual bool Initialize()override;
+    virtual bool Initialize()override;
 
 private:
-	virtual void OnResize()override;
-	virtual void Update(const GameTimer& gt)override;
-	virtual void Draw(const GameTimer& gt)override;
+    virtual void OnResize()override;
+    virtual void Update(const GameTimer& gt)override;
+    virtual void Draw(const GameTimer& gt)override;
 
-	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
-	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
-	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
+    virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
+    virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
+    virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
 
-	void OnKeyboardInput(const GameTimer& gt);
+    void OnKeyboardInput(const GameTimer& gt);
 	void UpdateCamera(const GameTimer& gt);
 	void AnimateMaterials(const GameTimer& gt);
 	void UpdateObjectCBs(const GameTimer& gt);
@@ -91,28 +88,28 @@ private:
 	void UpdateReflectedPassCB(const GameTimer& gt);
 
 	void LoadTextures();
-	void BuildRootSignature();
+    void BuildRootSignature();
 	void BuildDescriptorHeaps();
-	void BuildShadersAndInputLayout();
-	void BuildRoomGeometry();
+    void BuildShadersAndInputLayout();
+    void BuildRoomGeometry();
 	void BuildSkullGeometry();
-	void BuildPSOs();
-	void BuildFrameResources();
-	void BuildMaterials();
-	void BuildRenderItems();
-	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
+    void BuildPSOs();
+    void BuildFrameResources();
+    void BuildMaterials();
+    void BuildRenderItems();
+    void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
 
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
 
 private:
 
-	std::vector<std::unique_ptr<FrameResource>> mFrameResources;
-	FrameResource* mCurrFrameResource = nullptr;
-	int mCurrFrameResourceIndex = 0;
+    std::vector<std::unique_ptr<FrameResource>> mFrameResources;
+    FrameResource* mCurrFrameResource = nullptr;
+    int mCurrFrameResourceIndex = 0;
 
-	UINT mCbvSrvDescriptorSize = 0;
+    UINT mCbvSrvDescriptorSize = 0;
 
-	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+    ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 
 	ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
 
@@ -122,12 +119,13 @@ private:
 	std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
 	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
 
-	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+    std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 
 	// Cache render items of interest.
 	RenderItem* mSkullRitem = nullptr;
 	RenderItem* mReflectedSkullRitem = nullptr;
 	RenderItem* mShadowedSkullRitem = nullptr;
+	RenderItem* mReflectedFloor = nullptr;
 
 	// List of all the render items.
 	std::vector<std::unique_ptr<RenderItem>> mAllRitems;
@@ -135,7 +133,7 @@ private:
 	// Render items divided by PSO.
 	std::vector<RenderItem*> mRitemLayer[(int)RenderLayer::Count];
 
-	PassConstants mMainPassCB;
+    PassConstants mMainPassCB;
 	PassConstants mReflectedPassCB;
 
 	XMFLOAT3 mSkullTranslation = { 0.0f, 1.0f, -5.0f };
@@ -144,108 +142,108 @@ private:
 	XMFLOAT4X4 mView = MathHelper::Identity4x4();
 	XMFLOAT4X4 mProj = MathHelper::Identity4x4();
 
-	float mTheta = 1.24f * XM_PI;
-	float mPhi = 0.42f * XM_PI;
-	float mRadius = 12.0f;
+    float mTheta = 1.24f*XM_PI;
+    float mPhi = 0.42f*XM_PI;
+    float mRadius = 12.0f;
 
-	POINT mLastMousePos;
+    POINT mLastMousePos;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
-	PSTR cmdLine, int showCmd)
+    PSTR cmdLine, int showCmd)
 {
-	// Enable run-time memory check for debug builds.
+    // Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	try
-	{
-		StencilApp theApp(hInstance);
-		if (!theApp.Initialize())
-			return 0;
+    try
+    {
+        StencilApp theApp(hInstance);
+        if(!theApp.Initialize())
+            return 0;
 
-		return theApp.Run();
-	}
-	catch (DxException& e)
-	{
-		MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
-		return 0;
-	}
+        return theApp.Run();
+    }
+    catch(DxException& e)
+    {
+        MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
+        return 0;
+    }
 }
 
 StencilApp::StencilApp(HINSTANCE hInstance)
-	: D3DApp(hInstance)
+    : D3DApp(hInstance)
 {
 }
 
 StencilApp::~StencilApp()
 {
-	if (md3dDevice != nullptr)
-		FlushCommandQueue();
+    if(md3dDevice != nullptr)
+        FlushCommandQueue();
 }
 
 bool StencilApp::Initialize()
 {
-	if (!D3DApp::Initialize())
-		return false;
+    if(!D3DApp::Initialize())
+        return false;
 
-	// Reset the command list to prep for initialization commands.
-	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+    // Reset the command list to prep for initialization commands.
+    ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-	// Get the increment size of a descriptor in this heap type.  This is hardware specific, 
+    // Get the increment size of a descriptor in this heap type.  This is hardware specific, 
 	// so we have to query this information.
-	mCbvSrvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    mCbvSrvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	LoadTextures();
-	BuildRootSignature();
+    BuildRootSignature();
 	BuildDescriptorHeaps();
-	BuildShadersAndInputLayout();
-	BuildRoomGeometry();
+    BuildShadersAndInputLayout();
+    BuildRoomGeometry();
 	BuildSkullGeometry();
 	BuildMaterials();
-	BuildRenderItems();
-	BuildFrameResources();
-	BuildPSOs();
+    BuildRenderItems();
+    BuildFrameResources();
+    BuildPSOs();
 
-	// Execute the initialization commands.
-	ThrowIfFailed(mCommandList->Close());
-	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+    // Execute the initialization commands.
+    ThrowIfFailed(mCommandList->Close());
+    ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
+    mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-	// Wait until initialization is complete.
-	FlushCommandQueue();
+    // Wait until initialization is complete.
+    FlushCommandQueue();
 
-	return true;
+    return true;
 }
-
+ 
 void StencilApp::OnResize()
 {
-	D3DApp::OnResize();
+    D3DApp::OnResize();
 
-	// The window resized, so update the aspect ratio and recompute the projection matrix.
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, P);
+    // The window resized, so update the aspect ratio and recompute the projection matrix.
+    XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+    XMStoreFloat4x4(&mProj, P);
 }
 
 void StencilApp::Update(const GameTimer& gt)
 {
-	OnKeyboardInput(gt);
+    OnKeyboardInput(gt);
 	UpdateCamera(gt);
 
-	// Cycle through the circular frame resource array.
-	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
-	mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
+    // Cycle through the circular frame resource array.
+    mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
+    mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
 
-	// Has the GPU finished processing the commands of the current frame resource?
-	// If not, wait until the GPU has completed commands up to this fence point.
-	if (mCurrFrameResource->Fence != 0 && mFence->GetCompletedValue() < mCurrFrameResource->Fence)
-	{
-		HANDLE eventHandle = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
-		ThrowIfFailed(mFence->SetEventOnCompletion(mCurrFrameResource->Fence, eventHandle));
-		WaitForSingleObject(eventHandle, INFINITE);
-		CloseHandle(eventHandle);
-	}
+    // Has the GPU finished processing the commands of the current frame resource?
+    // If not, wait until the GPU has completed commands up to this fence point.
+    if(mCurrFrameResource->Fence != 0 && mFence->GetCompletedValue() < mCurrFrameResource->Fence)
+    {
+        HANDLE eventHandle = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
+        ThrowIfFailed(mFence->SetEventOnCompletion(mCurrFrameResource->Fence, eventHandle));
+        WaitForSingleObject(eventHandle, INFINITE);
+        CloseHandle(eventHandle);
+    }
 
 	AnimateMaterials(gt);
 	UpdateObjectCBs(gt);
@@ -256,33 +254,33 @@ void StencilApp::Update(const GameTimer& gt)
 
 void StencilApp::Draw(const GameTimer& gt)
 {
-	auto cmdListAlloc = mCurrFrameResource->CmdListAlloc;
+    auto cmdListAlloc = mCurrFrameResource->CmdListAlloc;
 
-	// Reuse the memory associated with command recording.
-	// We can only reset when the associated command lists have finished execution on the GPU.
-	ThrowIfFailed(cmdListAlloc->Reset());
+    // Reuse the memory associated with command recording.
+    // We can only reset when the associated command lists have finished execution on the GPU.
+    ThrowIfFailed(cmdListAlloc->Reset());
 
-	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-	// Reusing the command list reuses memory.
-	ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
+    // A command list can be reset after it has been added to the command queue via ExecuteCommandList.
+    // Reusing the command list reuses memory.
+    ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
 
-	mCommandList->RSSetViewports(1, &mScreenViewport);
-	mCommandList->RSSetScissorRects(1, &mScissorRect);
+    mCommandList->RSSetViewports(1, &mScreenViewport);
+    mCommandList->RSSetScissorRects(1, &mScissorRect);
 
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	// Indicate a state transition on the resource usage.
+    // Indicate a state transition on the resource usage.
 	mCommandList->ResourceBarrier(1, &barrier);
 
-	// Clear the back buffer and depth buffer.
-	mCommandList->ClearRenderTargetView(CurrentBackBufferView(), (float*)&mMainPassCB.FogColor, 0, nullptr);
-	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+    // Clear the back buffer and depth buffer.
+    mCommandList->ClearRenderTargetView(CurrentBackBufferView(), (float*)&mMainPassCB.FogColor, 0, nullptr);
+    mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-	// Specify the buffers we are going to render to.
+    // Specify the buffers we are going to render to.
 	D3D12_CPU_DESCRIPTOR_HANDLE cbbv = CurrentBackBufferView();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DepthStencilView();
 
-	mCommandList->OMSetRenderTargets(1, &cbbv, true, &dsv);
+    mCommandList->OMSetRenderTargets(1, &cbbv, true, &dsv);
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { mSrvDescriptorHeap.Get() };
 	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -294,13 +292,8 @@ void StencilApp::Draw(const GameTimer& gt)
 	// Draw opaque items--floors, walls, skull.
 	auto passCB = mCurrFrameResource->PassCB->Resource();
 	mCommandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
-	DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::Opaque]);
-	mCommandList->SetPipelineState(mPSOs["wall"].Get());
-	DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::wall]);
-	mCommandList->SetPipelineState(mPSOs["skull"].Get());
-	DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::skull]);
-
-
+    DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::Opaque]);
+	
 	// Mark the visible mirror pixels in the stencil buffer with the value 1
 	mCommandList->OMSetStencilRef(1);
 	mCommandList->SetPipelineState(mPSOs["markStencilMirrors"].Get());
@@ -323,76 +316,76 @@ void StencilApp::Draw(const GameTimer& gt)
 	// Draw shadows
 	mCommandList->SetPipelineState(mPSOs["shadow"].Get());
 	DrawRenderItems(mCommandList.Get(), mRitemLayer[(int)RenderLayer::Shadow]);
-
-	// Indicate a state transition on the resource usage.
+	
+    // Indicate a state transition on the resource usage.
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 	mCommandList->ResourceBarrier(1, &barrier);
 
-	// Done recording commands.
-	ThrowIfFailed(mCommandList->Close());
+    // Done recording commands.
+    ThrowIfFailed(mCommandList->Close());
 
-	// Add the command list to the queue for execution.
-	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+    // Add the command list to the queue for execution.
+    ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
+    mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-	// Swap the back and front buffers
-	ThrowIfFailed(mSwapChain->Present(0, 0));
+    // Swap the back and front buffers
+    ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
-	// Advance the fence value to mark commands up to this fence point.
-	mCurrFrameResource->Fence = ++mCurrentFence;
+    // Advance the fence value to mark commands up to this fence point.
+    mCurrFrameResource->Fence = ++mCurrentFence;
 
-	// Notify the fence when the GPU completes commands up to this fence point.
-	mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+    // Notify the fence when the GPU completes commands up to this fence point.
+    mCommandQueue->Signal(mFence.Get(), mCurrentFence);
 }
 
 void StencilApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
+    mLastMousePos.x = x;
+    mLastMousePos.y = y;
 
-	SetCapture(mhMainWnd);
+    SetCapture(mhMainWnd);
 }
 
 void StencilApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
-	ReleaseCapture();
+    ReleaseCapture();
 }
 
 void StencilApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
+    if((btnState & MK_LBUTTON) != 0)
+    {
+        // Make each pixel correspond to a quarter of a degree.
+        float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
+        float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
 
-		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi += dy;
+        // Update angles based on input to orbit camera around box.
+        mTheta += dx;
+        mPhi += dy;
 
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.2f * static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.2f * static_cast<float>(y - mLastMousePos.y);
+        // Restrict the angle mPhi.
+        mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
+    }
+    else if((btnState & MK_RBUTTON) != 0)
+    {
+        // Make each pixel correspond to 0.2 unit in the scene.
+        float dx = 0.2f*static_cast<float>(x - mLastMousePos.x);
+        float dy = 0.2f*static_cast<float>(y - mLastMousePos.y);
 
-		// Update the camera radius based on input.
-		mRadius += dx - dy;
+        // Update the camera radius based on input.
+        mRadius += dx - dy;
 
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 5.0f, 150.0f);
-	}
+        // Restrict the radius.
+        mRadius = MathHelper::Clamp(mRadius, 5.0f, 150.0f);
+    }
 
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
+    mLastMousePos.x = x;
+    mLastMousePos.y = y;
 }
-
+ 
 void StencilApp::OnKeyboardInput(const GameTimer& gt)
 {
 	//
@@ -401,26 +394,26 @@ void StencilApp::OnKeyboardInput(const GameTimer& gt)
 
 	const float dt = gt.DeltaTime();
 
-	if (GetAsyncKeyState('A') & 0x8000)
-		mSkullTranslation.x -= 1.0f * dt;
+	if(GetAsyncKeyState('A') & 0x8000)
+		mSkullTranslation.x -= 1.0f*dt;
 
-	if (GetAsyncKeyState('D') & 0x8000)
-		mSkullTranslation.x += 1.0f * dt;
+	if(GetAsyncKeyState('D') & 0x8000)
+		mSkullTranslation.x += 1.0f*dt;
 
-	if (GetAsyncKeyState('W') & 0x8000)
-		mSkullTranslation.y += 1.0f * dt;
+	if(GetAsyncKeyState('W') & 0x8000)
+		mSkullTranslation.y += 1.0f*dt;
 
-	if (GetAsyncKeyState('S') & 0x8000)
-		mSkullTranslation.y -= 1.0f * dt;
+	if(GetAsyncKeyState('S') & 0x8000)
+		mSkullTranslation.y -= 1.0f*dt;
 
 	// Don't let user move below ground plane.
 	mSkullTranslation.y = MathHelper::Max(mSkullTranslation.y, 0.0f);
 
 	// Update the new world matrix.
-	XMMATRIX skullRotate = XMMatrixRotationY(0.5f * MathHelper::Pi);
+	XMMATRIX skullRotate = XMMatrixRotationY(0.5f*MathHelper::Pi);
 	XMMATRIX skullScale = XMMatrixScaling(0.45f, 0.45f, 0.45f);
 	XMMATRIX skullOffset = XMMatrixTranslation(mSkullTranslation.x, mSkullTranslation.y, mSkullTranslation.z);
-	XMMATRIX skullWorld = skullRotate * skullScale * skullOffset;
+	XMMATRIX skullWorld = skullRotate*skullScale*skullOffset;
 	XMStoreFloat4x4(&mSkullRitem->World, skullWorld);
 
 	// Update reflection world matrix.
@@ -433,19 +426,21 @@ void StencilApp::OnKeyboardInput(const GameTimer& gt)
 	XMVECTOR toMainLight = -XMLoadFloat3(&mMainPassCB.Lights[0].Direction);
 	XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
 	XMMATRIX shadowOffsetY = XMMatrixTranslation(0.0f, 0.001f, 0.0f);
-	XMStoreFloat4x4(&mShadowedSkullRitem->World, skullWorld * S * shadowOffsetY);
+	XMStoreFloat4x4(&mShadowedSkullRitem->World, skullWorld * S /* * shadowOffsetY*/);
+
 
 	mSkullRitem->NumFramesDirty = gNumFrameResources;
 	mReflectedSkullRitem->NumFramesDirty = gNumFrameResources;
 	mShadowedSkullRitem->NumFramesDirty = gNumFrameResources;
+	mReflectedFloor->NumFramesDirty = gNumFrameResources;
 }
-
+ 
 void StencilApp::UpdateCamera(const GameTimer& gt)
 {
 	// Convert Spherical to Cartesian coordinates.
-	mEyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
-	mEyePos.z = mRadius * sinf(mPhi) * sinf(mTheta);
-	mEyePos.y = mRadius * cosf(mPhi);
+	mEyePos.x = mRadius*sinf(mPhi)*cosf(mTheta);
+	mEyePos.z = mRadius*sinf(mPhi)*sinf(mTheta);
+	mEyePos.y = mRadius*cosf(mPhi);
 
 	// Build the view matrix.
 	XMVECTOR pos = XMVectorSet(mEyePos.x, mEyePos.y, mEyePos.z, 1.0f);
@@ -464,11 +459,11 @@ void StencilApp::AnimateMaterials(const GameTimer& gt)
 void StencilApp::UpdateObjectCBs(const GameTimer& gt)
 {
 	auto currObjectCB = mCurrFrameResource->ObjectCB.get();
-	for (auto& e : mAllRitems)
+	for(auto& e : mAllRitems)
 	{
 		// Only update the cbuffer data if the constants have changed.  
 		// This needs to be tracked per frame resource.
-		if (e->NumFramesDirty > 0)
+		if(e->NumFramesDirty > 0)
 		{
 			XMMATRIX world = XMLoadFloat4x4(&e->World);
 			XMMATRIX texTransform = XMLoadFloat4x4(&e->TexTransform);
@@ -488,12 +483,12 @@ void StencilApp::UpdateObjectCBs(const GameTimer& gt)
 void StencilApp::UpdateMaterialCBs(const GameTimer& gt)
 {
 	auto currMaterialCB = mCurrFrameResource->MaterialCB.get();
-	for (auto& e : mMaterials)
+	for(auto& e : mMaterials)
 	{
 		// Only update the cbuffer data if the constants have changed.  If the cbuffer
 		// data changes, it needs to be updated for each FrameResource.
 		Material* mat = e.second.get();
-		if (mat->NumFramesDirty > 0)
+		if(mat->NumFramesDirty > 0)
 		{
 			XMMATRIX matTransform = XMLoadFloat4x4(&mat->MatTransform);
 
@@ -523,7 +518,7 @@ void StencilApp::UpdateMainPassCB(const GameTimer& gt)
 
 	XMVECTOR projdet = XMMatrixDeterminant(proj);
 	XMMATRIX invProj = XMMatrixInverse(&projdet, proj);
-
+	
 	XMVECTOR viewprojdet = XMMatrixDeterminant(viewProj);
 	XMMATRIX invViewProj = XMMatrixInverse(&viewprojdet, viewProj);
 
@@ -561,7 +556,7 @@ void StencilApp::UpdateReflectedPassCB(const GameTimer& gt)
 	XMMATRIX R = XMMatrixReflect(mirrorPlane);
 
 	// Reflect the lighting.
-	for (int i = 0; i < 3; ++i)
+	for(int i = 0; i < 3; ++i)
 	{
 		XMVECTOR lightDir = XMLoadFloat3(&mMainPassCB.Lights[i].Direction);
 		XMVECTOR reflectedLightDir = XMVector3TransformNormal(lightDir, R);
@@ -614,39 +609,39 @@ void StencilApp::BuildRootSignature()
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-	// Root parameter can be a table, root descriptor or root constants.
-	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
+    // Root parameter can be a table, root descriptor or root constants.
+    CD3DX12_ROOT_PARAMETER slotRootParameter[4];
 
 	// Perfomance TIP: Order from most frequent to least frequent.
 	slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
-	slotRootParameter[1].InitAsConstantBufferView(0);
-	slotRootParameter[2].InitAsConstantBufferView(1);
-	slotRootParameter[3].InitAsConstantBufferView(2);
+    slotRootParameter[1].InitAsConstantBufferView(0);
+    slotRootParameter[2].InitAsConstantBufferView(1);
+    slotRootParameter[3].InitAsConstantBufferView(2);
 
 	auto staticSamplers = GetStaticSamplers();
 
-	// A root signature is an array of root parameters.
+    // A root signature is an array of root parameters.
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter,
 		(UINT)staticSamplers.size(), staticSamplers.data(),
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-	ComPtr<ID3DBlob> serializedRootSig = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+    // create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+    ComPtr<ID3DBlob> serializedRootSig = nullptr;
+    ComPtr<ID3DBlob> errorBlob = nullptr;
+    HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+        serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
 
-	if (errorBlob != nullptr)
-	{
-		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	}
-	ThrowIfFailed(hr);
+    if(errorBlob != nullptr)
+    {
+        ::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+    }
+    ThrowIfFailed(hr);
 
-	ThrowIfFailed(md3dDevice->CreateRootSignature(
+    ThrowIfFailed(md3dDevice->CreateRootSignature(
 		0,
-		serializedRootSig->GetBufferPointer(),
-		serializedRootSig->GetBufferSize(),
-		IID_PPV_ARGS(mRootSignature.GetAddressOf())));
+        serializedRootSig->GetBufferPointer(),
+        serializedRootSig->GetBufferSize(),
+        IID_PPV_ARGS(mRootSignature.GetAddressOf())));
 }
 
 void StencilApp::BuildDescriptorHeaps()
@@ -712,34 +707,34 @@ void StencilApp::BuildShadersAndInputLayout()
 		NULL, NULL
 	};
 
-	mShaders["standardVS"] = d3dUtil::CompileShader(L"..\\Chap11_4\\Shaders\\Default.hlsl", nullptr, "VS", "vs_5_0");
-	mShaders["opaquePS"] = d3dUtil::CompileShader(L"..\\Chap11_4\\Shaders\\Default.hlsl", defines, "PS", "ps_5_0");
-	mShaders["alphaTestedPS"] = d3dUtil::CompileShader(L"..\\Chap11_4\\Shaders\\Default.hlsl", alphaTestDefines, "PS", "ps_5_0");
-
-	mInputLayout =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	mShaders["standardVS"] = d3dUtil::CompileShader(L"..\\Chap11_11\\Shaders\\Default.hlsl", nullptr, "VS", "vs_5_0");
+	mShaders["opaquePS"] = d3dUtil::CompileShader(L"..\\Chap11_11\\Shaders\\Default.hlsl", defines, "PS", "ps_5_0");
+	mShaders["alphaTestedPS"] = d3dUtil::CompileShader(L"..\\Chap11_11\\Shaders\\Default.hlsl", alphaTestDefines, "PS", "ps_5_0");
+	
+    mInputLayout =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	};
+    };
 }
 
 void StencilApp::BuildRoomGeometry()
 {
-	// Create and specify geometry.  For this sample we draw a floor
-// and a wall with a mirror on it.  We put the floor, wall, and
-// mirror geometry in one vertex buffer.
-//
-//   |--------------|
-//   |              |
-//   |----|----|----|
-//   |Wall|Mirr|Wall|
-//   |    | or |    |
-//   /--------------/
-//  /   Floor      /
-// /--------------/
+    	// Create and specify geometry.  For this sample we draw a floor
+	// and a wall with a mirror on it.  We put the floor, wall, and
+	// mirror geometry in one vertex buffer.
+	//
+	//   |--------------|
+	//   |              |
+    //   |----|----|----|
+    //   |Wall|Mirr|Wall|
+	//   |    | or |    |
+    //   /--------------/
+    //  /   Floor      /
+	// /--------------/
 
-	std::array<Vertex, 20> vertices =
+	std::array<Vertex, 20> vertices = 
 	{
 		// Floor: Observe we tile texture coordinates.
 		Vertex(-3.5f, 0.0f, -10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 4.0f), // 0 
@@ -771,10 +766,10 @@ void StencilApp::BuildRoomGeometry()
 		Vertex(2.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f)
 	};
 
-	std::array<std::int16_t, 30> indices =
+	std::array<std::int16_t, 30> indices = 
 	{
 		// Floor
-		0, 1, 2,
+		0, 1, 2,	
 		0, 2, 3,
 
 		// Walls
@@ -807,8 +802,8 @@ void StencilApp::BuildRoomGeometry()
 	mirrorSubmesh.StartIndexLocation = 24;
 	mirrorSubmesh.BaseVertexLocation = 0;
 
-	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+    const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
 	auto geo = std::make_unique<MeshGeometry>();
 	geo->Name = "roomGeo";
@@ -839,11 +834,11 @@ void StencilApp::BuildRoomGeometry()
 
 void StencilApp::BuildSkullGeometry()
 {
-	std::ifstream fin("../Chap11_Stencil/Models/skull.txt");
-
-	if (!fin)
+	std::ifstream fin("Models/skull.txt");
+	
+	if(!fin)
 	{
-		MessageBox(0, L"../Chap11_Stencil/Models/skull.txt not found.", 0, 0);
+		MessageBox(0, L"Models/skull.txt not found.", 0, 0);
 		return;
 	}
 
@@ -854,9 +849,9 @@ void StencilApp::BuildSkullGeometry()
 	fin >> ignore >> vcount;
 	fin >> ignore >> tcount;
 	fin >> ignore >> ignore >> ignore >> ignore;
-
+	
 	std::vector<Vertex> vertices(vcount);
-	for (UINT i = 0; i < vcount; ++i)
+	for(UINT i = 0; i < vcount; ++i)
 	{
 		fin >> vertices[i].Pos.x >> vertices[i].Pos.y >> vertices[i].Pos.z;
 		fin >> vertices[i].Normal.x >> vertices[i].Normal.y >> vertices[i].Normal.z;
@@ -870,17 +865,17 @@ void StencilApp::BuildSkullGeometry()
 	fin >> ignore;
 
 	std::vector<std::int32_t> indices(3 * tcount);
-	for (UINT i = 0; i < tcount; ++i)
+	for(UINT i = 0; i < tcount; ++i)
 	{
-		fin >> indices[i * 3 + 0] >> indices[i * 3 + 1] >> indices[i * 3 + 2];
+		fin >> indices[i*3+0] >> indices[i*3+1] >> indices[i*3+2];
 	}
 
 	fin.close();
-
+ 
 	//
 	// Pack the indices of all the meshes into one index buffer.
 	//
-
+ 
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::int32_t);
@@ -917,21 +912,21 @@ void StencilApp::BuildSkullGeometry()
 
 void StencilApp::BuildPSOs()
 {
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 
 	//
 	// PSO for opaque objects.
 	//
-	ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+    ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	opaquePsoDesc.InputLayout = { mInputLayout.data(), (UINT)mInputLayout.size() };
 	opaquePsoDesc.pRootSignature = mRootSignature.Get();
-	opaquePsoDesc.VS =
-	{
-		reinterpret_cast<BYTE*>(mShaders["standardVS"]->GetBufferPointer()),
+	opaquePsoDesc.VS = 
+	{ 
+		reinterpret_cast<BYTE*>(mShaders["standardVS"]->GetBufferPointer()), 
 		mShaders["standardVS"]->GetBufferSize()
 	};
-	opaquePsoDesc.PS =
-	{
+	opaquePsoDesc.PS = 
+	{ 
 		reinterpret_cast<BYTE*>(mShaders["opaquePS"]->GetBufferPointer()),
 		mShaders["opaquePS"]->GetBufferSize()
 	};
@@ -945,7 +940,7 @@ void StencilApp::BuildPSOs()
 	opaquePsoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
 	opaquePsoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 	opaquePsoDesc.DSVFormat = mDepthStencilFormat;
-	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&mPSOs["opaque"])));
+    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&mPSOs["opaque"])));
 
 	//
 	// PSO for transparent objects
@@ -977,12 +972,12 @@ void StencilApp::BuildPSOs()
 
 	D3D12_DEPTH_STENCIL_DESC mirrorDSS;
 	mirrorDSS.DepthEnable = true;
-	mirrorDSS.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // D3D12_DEPTH_WRITE_MASK_ZERO 원래 버전
+	mirrorDSS.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	mirrorDSS.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
 	mirrorDSS.StencilEnable = true;
 	mirrorDSS.StencilReadMask = 0xff;
 	mirrorDSS.StencilWriteMask = 0xff;
-
+	
 	mirrorDSS.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
 	mirrorDSS.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
 	mirrorDSS.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
@@ -1024,11 +1019,8 @@ void StencilApp::BuildPSOs()
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC drawReflectionsPsoDesc = opaquePsoDesc;
 	drawReflectionsPsoDesc.DepthStencilState = reflectionsDSS;
-	drawReflectionsPsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK; 
-	
-	// 원래는 true인데 false로 바꿈 
-	drawReflectionsPsoDesc.RasterizerState.FrontCounterClockwise = false; 
-
+	drawReflectionsPsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+	drawReflectionsPsoDesc.RasterizerState.FrontCounterClockwise = true;
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&drawReflectionsPsoDesc, IID_PPV_ARGS(&mPSOs["drawStencilReflections"])));
 
 	//
@@ -1058,40 +1050,20 @@ void StencilApp::BuildPSOs()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC shadowPsoDesc = transparentPsoDesc;
 	shadowPsoDesc.DepthStencilState = shadowDSS;
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&shadowPsoDesc, IID_PPV_ARGS(&mPSOs["shadow"])));
-
-	auto wallDS = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	wallDS.DepthEnable = true;
-	wallDS.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	wallDS.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC wallPsoDesc = opaquePsoDesc;
-	opaquePsoDesc.DepthStencilState = wallDS;
-	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&wallPsoDesc, IID_PPV_ARGS(&mPSOs["wall"])));
-
-	auto skullDS = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	skullDS.DepthEnable = true;
-	skullDS.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	skullDS.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC skullPsoDesc = opaquePsoDesc;
-	opaquePsoDesc.DepthStencilState = skullDS;
-	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&skullPsoDesc, IID_PPV_ARGS(&mPSOs["skull"])));
-
 }
 
 void StencilApp::BuildFrameResources()
 {
-	for (int i = 0; i < gNumFrameResources; ++i)
-	{
-		mFrameResources.push_back(std::make_unique<FrameResource>(md3dDevice.Get(),
-			2, (UINT)mAllRitems.size(), (UINT)mMaterials.size()));
-	}
+    for(int i = 0; i < gNumFrameResources; ++i)
+    {
+        mFrameResources.push_back(std::make_unique<FrameResource>(md3dDevice.Get(),
+            2, (UINT)mAllRitems.size(), (UINT)mMaterials.size()));
+    }
 }
 
 void StencilApp::BuildMaterials()
 {
 	auto bricks = std::make_unique<Material>();
-	bricks->Name = "bricks";
 	bricks->MatCBIndex = 0;
 	bricks->DiffuseSrvHeapIndex = 0;
 	bricks->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -1151,7 +1123,7 @@ void StencilApp::BuildRenderItems()
 	floorRitem->BaseVertexLocation = floorRitem->Geo->DrawArgs["floor"].BaseVertexLocation;
 	mRitemLayer[(int)RenderLayer::Opaque].push_back(floorRitem.get());
 
-	auto wallsRitem = std::make_unique<RenderItem>();
+    auto wallsRitem = std::make_unique<RenderItem>();
 	wallsRitem->World = MathHelper::Identity4x4();
 	wallsRitem->TexTransform = MathHelper::Identity4x4();
 	wallsRitem->ObjCBIndex = 1;
@@ -1161,7 +1133,7 @@ void StencilApp::BuildRenderItems()
 	wallsRitem->IndexCount = wallsRitem->Geo->DrawArgs["wall"].IndexCount;
 	wallsRitem->StartIndexLocation = wallsRitem->Geo->DrawArgs["wall"].StartIndexLocation;
 	wallsRitem->BaseVertexLocation = wallsRitem->Geo->DrawArgs["wall"].BaseVertexLocation;
-	mRitemLayer[(int)RenderLayer::wall].push_back(wallsRitem.get());
+	mRitemLayer[(int)RenderLayer::Opaque].push_back(wallsRitem.get());
 
 	auto skullRitem = std::make_unique<RenderItem>();
 	skullRitem->World = MathHelper::Identity4x4();
@@ -1174,7 +1146,7 @@ void StencilApp::BuildRenderItems()
 	skullRitem->StartIndexLocation = skullRitem->Geo->DrawArgs["skull"].StartIndexLocation;
 	skullRitem->BaseVertexLocation = skullRitem->Geo->DrawArgs["skull"].BaseVertexLocation;
 	mSkullRitem = skullRitem.get();
-	mRitemLayer[(int)RenderLayer::skull].push_back(skullRitem.get());
+	mRitemLayer[(int)RenderLayer::Opaque].push_back(skullRitem.get());
 
 	// Reflected skull will have different world matrix, so it needs to be its own render item.
 	auto reflectedSkullRitem = std::make_unique<RenderItem>();
@@ -1182,6 +1154,8 @@ void StencilApp::BuildRenderItems()
 	reflectedSkullRitem->ObjCBIndex = 3;
 	mReflectedSkullRitem = reflectedSkullRitem.get();
 	mRitemLayer[(int)RenderLayer::Reflected].push_back(reflectedSkullRitem.get());
+
+
 
 	// Shadowed skull will have different world matrix, so it needs to be its own render item.
 	auto shadowedSkullRitem = std::make_unique<RenderItem>();
@@ -1204,46 +1178,54 @@ void StencilApp::BuildRenderItems()
 	mRitemLayer[(int)RenderLayer::Mirrors].push_back(mirrorRitem.get());
 	mRitemLayer[(int)RenderLayer::Transparent].push_back(mirrorRitem.get());
 
+	auto reflectedFloorRitem = std::make_unique<RenderItem>();
+	*reflectedFloorRitem = *floorRitem;
+	reflectedFloorRitem->ObjCBIndex = 6;
+	mReflectedFloor = reflectedFloorRitem.get();
+	mRitemLayer[(int)RenderLayer::Reflected].push_back(reflectedFloorRitem.get());
+
 	mAllRitems.push_back(std::move(floorRitem));
 	mAllRitems.push_back(std::move(wallsRitem));
 	mAllRitems.push_back(std::move(skullRitem));
 	mAllRitems.push_back(std::move(reflectedSkullRitem));
 	mAllRitems.push_back(std::move(shadowedSkullRitem));
 	mAllRitems.push_back(std::move(mirrorRitem));
+	mAllRitems.push_back(std::move(reflectedFloorRitem));
+
 }
 
 void StencilApp::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems)
 {
-	UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-	UINT matCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
+    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    UINT matCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
 
 	auto objectCB = mCurrFrameResource->ObjectCB->Resource();
 	auto matCB = mCurrFrameResource->MaterialCB->Resource();
 
-	// For each render item...
-	for (size_t i = 0; i < ritems.size(); ++i)
-	{
-		auto ri = ritems[i];
+    // For each render item...
+    for(size_t i = 0; i < ritems.size(); ++i)
+    {
+        auto ri = ritems[i];
 
 		D3D12_VERTEX_BUFFER_VIEW vbv = ri->Geo->VertexBufferView();
-		cmdList->IASetVertexBuffers(0, 1, &vbv);
+        cmdList->IASetVertexBuffers(0, 1, &vbv);
 
 		D3D12_INDEX_BUFFER_VIEW ibv = ri->Geo->IndexBufferView();
-		cmdList->IASetIndexBuffer(&ibv);
-		cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
+        cmdList->IASetIndexBuffer(&ibv);
+        cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 		tex.Offset(ri->Mat->DiffuseSrvHeapIndex, mCbvSrvDescriptorSize);
 
-		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->ObjCBIndex * objCBByteSize;
-		D3D12_GPU_VIRTUAL_ADDRESS matCBAddress = matCB->GetGPUVirtualAddress() + ri->Mat->MatCBIndex * matCBByteSize;
+        D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->ObjCBIndex*objCBByteSize;
+		D3D12_GPU_VIRTUAL_ADDRESS matCBAddress = matCB->GetGPUVirtualAddress() + ri->Mat->MatCBIndex*matCBByteSize;
 
 		cmdList->SetGraphicsRootDescriptorTable(0, tex);
-		cmdList->SetGraphicsRootConstantBufferView(1, objCBAddress);
-		cmdList->SetGraphicsRootConstantBufferView(3, matCBAddress);
+        cmdList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+        cmdList->SetGraphicsRootConstantBufferView(3, matCBAddress);
 
-		cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
-	}
+        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+    }
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> StencilApp::GetStaticSamplers()
@@ -1297,8 +1279,8 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> StencilApp::GetStaticSamplers()
 		0.0f,                              // mipLODBias
 		8);                                // maxAnisotropy
 
-	return {
+	return { 
 		pointWrap, pointClamp,
-		linearWrap, linearClamp,
+		linearWrap, linearClamp, 
 		anisotropicWrap, anisotropicClamp };
 }

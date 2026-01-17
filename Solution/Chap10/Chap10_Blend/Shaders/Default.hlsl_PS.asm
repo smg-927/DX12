@@ -103,195 +103,202 @@
    0: sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.xyzw, s4
    1: mul r0.xyzw, r0.xyzw, cb2[0].xyzw  // r0.x <- diffuseAlbedo.x; r0.y <- diffuseAlbedo.y; r0.z <- diffuseAlbedo.z; r0.w <- diffuseAlbedo.w
 
+#line 125
+   2: mov r1.x, l(-0.100000)
+   3: add r1.x, r0.w, r1.x
+   4: lt r1.x, r1.x, l(0.000000)
+   5: and r1.x, r1.x, l(-1)
+   6: discard_nz r1.x
+
 #line 129
-   2: dp3 r1.x, v2.xyzx, v2.xyzx
-   3: rsq r1.x, r1.x
-   4: mul r1.xyz, r1.xxxx, v2.xyzx  // r1.x <- pin.NormalW.x; r1.y <- pin.NormalW.y; r1.z <- pin.NormalW.z
+   7: dp3 r1.x, v2.xyzx, v2.xyzx
+   8: rsq r1.x, r1.x
+   9: mul r1.xyz, r1.xxxx, v2.xyzx  // r1.x <- pin.NormalW.x; r1.y <- pin.NormalW.y; r1.z <- pin.NormalW.z
 
 #line 132
-   5: mov r2.xyz, -v1.xyzx
-   6: add r2.xyz, r2.xyzx, cb1[24].xyzx  // r2.x <- toEyeW.x; r2.y <- toEyeW.y; r2.z <- toEyeW.z
+  10: mov r2.xyz, -v1.xyzx
+  11: add r2.xyz, r2.xyzx, cb1[24].xyzx  // r2.x <- toEyeW.x; r2.y <- toEyeW.y; r2.z <- toEyeW.z
 
 #line 133
-   7: dp3 r1.w, r2.xyzx, r2.xyzx
-   8: sqrt r1.w, r1.w  // r1.w <- distToEye
+  12: dp3 r1.w, r2.xyzx, r2.xyzx
+  13: sqrt r1.w, r1.w  // r1.w <- distToEye
 
 #line 134
-   9: div r2.xyz, r2.xyzx, r1.wwww
+  14: div r2.xyz, r2.xyzx, r1.wwww
 
 #line 137
-  10: mul r3.xyz, r0.xyzx, cb1[27].xyzx  // r3.x <- ambient.x; r3.y <- ambient.y; r3.z <- ambient.z
+  15: mul r3.xyz, r0.xyzx, cb1[27].xyzx  // r3.x <- ambient.x; r3.y <- ambient.y; r3.z <- ambient.z
 
 #line 139
-  11: mov r2.w, -cb2[1].w
-  12: add r4.w, r2.w, l(1.000000)  // r4.w <- shininess
+  16: mov r2.w, -cb2[1].w
+  17: add r4.w, r2.w, l(1.000000)  // r4.w <- shininess
 
 #line 140
-  13: mov r5.xyz, r0.xyzx  // r5.x <- mat.DiffuseAlbedo.x; r5.y <- mat.DiffuseAlbedo.y; r5.z <- mat.DiffuseAlbedo.z
-  14: mov r5.w, cb2[1].x  // r5.w <- mat.FresnelR0.x
-  15: mov r4.yz, cb2[1].yyzy  // r4.y <- mat.FresnelR0.y; r4.z <- mat.FresnelR0.z
-  16: mov r4.w, r4.w  // r4.w <- mat.Shininess
+  18: mov r5.xyz, r0.xyzx  // r5.x <- mat.DiffuseAlbedo.x; r5.y <- mat.DiffuseAlbedo.y; r5.z <- mat.DiffuseAlbedo.z
+  19: mov r5.w, cb2[1].x  // r5.w <- mat.FresnelR0.x
+  20: mov r4.yz, cb2[1].yyzy  // r4.y <- mat.FresnelR0.y; r4.z <- mat.FresnelR0.z
+  21: mov r4.w, r4.w  // r4.w <- mat.Shininess
 
 #line 142
-  17: nop 
-  18: mov x0[0].xyz, cb1[30].xyzx
-  19: mov x0[2].xyz, cb1[31].xyzx
-  20: mov x0[4].xyz, cb1[32].xyzx
-  21: mov x0[6].xyz, cb1[33].xyzx
-  22: mov x0[8].xyz, cb1[34].xyzx
-  23: mov x0[10].xyz, cb1[35].xyzx
-  24: mov x0[12].xyz, cb1[36].xyzx
-  25: mov x0[14].xyz, cb1[37].xyzx
-  26: mov x0[16].xyz, cb1[38].xyzx
-  27: mov x0[18].xyz, cb1[39].xyzx
-  28: mov x0[20].xyz, cb1[40].xyzx
-  29: mov r5.xyzw, r5.xyzw
-  30: mov r4.yzw, r4.yyzw
-  31: mov r1.xyz, r1.xyzx
-  32: mov r2.xyz, r2.xyzx
+  22: nop 
+  23: mov x0[0].xyz, cb1[30].xyzx
+  24: mov x0[2].xyz, cb1[31].xyzx
+  25: mov x0[4].xyz, cb1[32].xyzx
+  26: mov x0[6].xyz, cb1[33].xyzx
+  27: mov x0[8].xyz, cb1[34].xyzx
+  28: mov x0[10].xyz, cb1[35].xyzx
+  29: mov x0[12].xyz, cb1[36].xyzx
+  30: mov x0[14].xyz, cb1[37].xyzx
+  31: mov x0[16].xyz, cb1[38].xyzx
+  32: mov x0[18].xyz, cb1[39].xyzx
+  33: mov x0[20].xyz, cb1[40].xyzx
+  34: mov r5.xyzw, r5.xyzw
+  35: mov r4.yzw, r4.yyzw
+  36: mov r1.xyz, r1.xyzx
+  37: mov r2.xyz, r2.xyzx
 
 #line 142 "LightingUtil.hlsl"
-  33: mov r0.xyz, l(0,0,0,0)  // r0.x <- result.x; r0.y <- result.y; r0.z <- result.z
+  38: mov r0.xyz, l(0,0,0,0)  // r0.x <- result.x; r0.y <- result.y; r0.z <- result.z
 
 #line 147
-  34: mov r2.w, l(0)  // r2.w <- i
-  35: mov r6.xyz, r0.xyzx  // r6.x <- result.x; r6.y <- result.y; r6.z <- result.z
-  36: mov r3.w, r2.w  // r3.w <- i
-  37: loop 
-  38:   ilt r4.x, r3.w, l(3)
-  39:   breakc_z r4.x
+  39: mov r2.w, l(0)  // r2.w <- i
+  40: mov r6.xyz, r0.xyzx  // r6.x <- result.x; r6.y <- result.y; r6.z <- result.z
+  41: mov r3.w, r2.w  // r3.w <- i
+  42: loop 
+  43:   ilt r4.x, r3.w, l(3)
+  44:   breakc_z r4.x
 
 #line 149
-  40:   mov r4.x, l(1.000000)  // r4.x <- shadowFactor.x
-  41:   nop 
-  42:   imul null, r6.w, r3.w, l(6)
-  43:   mov r7.xyz, x0[r6.w + 0].xyzx
-  44:   mov r8.xyz, x0[r6.w + 2].xyzx
-  45:   mov r9.x, r5.w
-  46:   mov r9.yzw, r4.yyzw
-  47:   mov r10.xyz, r5.xyzx
-  48:   mov r11.xyz, r1.xyzx
-  49:   mov r12.xyz, r2.xyzx
+  45:   mov r4.x, l(1.000000)  // r4.x <- shadowFactor.x
+  46:   nop 
+  47:   imul null, r6.w, r3.w, l(6)
+  48:   mov r7.xyz, x0[r6.w + 0].xyzx
+  49:   mov r8.xyz, x0[r6.w + 2].xyzx
+  50:   mov r9.x, r5.w
+  51:   mov r9.yzw, r4.yyzw
+  52:   mov r10.xyz, r5.xyzx
+  53:   mov r11.xyz, r1.xyzx
+  54:   mov r12.xyz, r2.xyzx
 
 #line 67
-  50:   mov r8.xyz, -r8.xyzx  // r8.x <- lightVec.x; r8.y <- lightVec.y; r8.z <- lightVec.z
+  55:   mov r8.xyz, -r8.xyzx  // r8.x <- lightVec.x; r8.y <- lightVec.y; r8.z <- lightVec.z
 
 #line 70
-  51:   dp3 r6.w, r8.xyzx, r11.xyzx
-  52:   max r6.w, r6.w, l(0.000000)  // r6.w <- ndotl
+  56:   dp3 r6.w, r8.xyzx, r11.xyzx
+  57:   max r6.w, r6.w, l(0.000000)  // r6.w <- ndotl
 
 #line 71
-  53:   mul r7.xyz, r6.wwww, r7.xyzx  // r7.x <- lightStrength.x; r7.y <- lightStrength.y; r7.z <- lightStrength.z
+  58:   mul r7.xyz, r6.wwww, r7.xyzx  // r7.x <- lightStrength.x; r7.y <- lightStrength.y; r7.z <- lightStrength.z
 
 #line 73
-  54:   nop 
-  55:   mov r7.xyz, r7.xyzx
-  56:   mov r8.xyz, r8.xyzx
-  57:   mov r11.xyz, r11.xyzx
-  58:   mov r12.xyz, r12.xyzx
-  59:   mov r10.xyz, r10.xyzx
-  60:   mov r9.xyzw, r9.xyzw
+  59:   nop 
+  60:   mov r7.xyz, r7.xyzx
+  61:   mov r8.xyz, r8.xyzx
+  62:   mov r11.xyz, r11.xyzx
+  63:   mov r12.xyz, r12.xyzx
+  64:   mov r10.xyz, r10.xyzx
+  65:   mov r9.xyzw, r9.xyzw
 
 #line 46
-  61:   mul r6.w, r9.w, l(256.000000)  // r6.w <- m
+  66:   mul r6.w, r9.w, l(256.000000)  // r6.w <- m
 
 #line 47
-  62:   add r12.xyz, r8.xyzx, r12.xyzx
-  63:   dp3 r7.w, r12.xyzx, r12.xyzx
-  64:   rsq r7.w, r7.w
-  65:   mul r12.xyz, r7.wwww, r12.xyzx  // r12.x <- halfVec.x; r12.y <- halfVec.y; r12.z <- halfVec.z
+  67:   add r12.xyz, r8.xyzx, r12.xyzx
+  68:   dp3 r7.w, r12.xyzx, r12.xyzx
+  69:   rsq r7.w, r7.w
+  70:   mul r12.xyz, r7.wwww, r12.xyzx  // r12.x <- halfVec.x; r12.y <- halfVec.y; r12.z <- halfVec.z
 
 #line 49
-  66:   add r7.w, r6.w, l(8.000000)
-  67:   dp3 r8.w, r12.xyzx, r11.xyzx
-  68:   max r8.w, r8.w, l(0.000000)
-  69:   log r8.w, r8.w
-  70:   mul r6.w, r6.w, r8.w
-  71:   exp r6.w, r6.w
-  72:   mul r6.w, r6.w, r7.w
-  73:   div r6.w, r6.w, l(8.000000)  // r6.w <- roughnessFactor
+  71:   add r7.w, r6.w, l(8.000000)
+  72:   dp3 r8.w, r12.xyzx, r11.xyzx
+  73:   max r8.w, r8.w, l(0.000000)
+  74:   log r8.w, r8.w
+  75:   mul r6.w, r6.w, r8.w
+  76:   exp r6.w, r6.w
+  77:   mul r6.w, r6.w, r7.w
+  78:   div r6.w, r6.w, l(8.000000)  // r6.w <- roughnessFactor
 
 #line 50
-  74:   nop 
-  75:   mov r9.xyz, r9.xyzx
-  76:   mov r12.xyz, r12.xyzx
-  77:   mov r8.xyz, r8.xyzx
+  79:   nop 
+  80:   mov r9.xyz, r9.xyzx
+  81:   mov r12.xyz, r12.xyzx
+  82:   mov r8.xyz, r8.xyzx
 
 #line 36
-  78:   dp3 r7.w, r12.xyzx, r8.xyzx
-  79:   max r7.w, r7.w, l(0.000000)
-  80:   min r7.w, r7.w, l(1.000000)  // r7.w <- cosIncidentAngle
+  83:   dp3 r7.w, r12.xyzx, r8.xyzx
+  84:   max r7.w, r7.w, l(0.000000)
+  85:   min r7.w, r7.w, l(1.000000)  // r7.w <- cosIncidentAngle
 
 #line 38
-  81:   mov r7.w, -r7.w
-  82:   add r7.w, r7.w, l(1.000000)  // r7.w <- f0
+  86:   mov r7.w, -r7.w
+  87:   add r7.w, r7.w, l(1.000000)  // r7.w <- f0
 
 #line 39
-  83:   mov r8.xyz, -r9.xyzx
-  84:   add r8.xyz, r8.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
-  85:   mul r8.w, r7.w, r7.w
-  86:   mul r8.w, r7.w, r8.w
-  87:   mul r8.w, r7.w, r8.w
-  88:   mul r7.w, r7.w, r8.w
-  89:   mul r8.xyz, r7.wwww, r8.xyzx
-  90:   add r8.xyz, r8.xyzx, r9.xyzx  // r8.x <- reflectPercent.x; r8.y <- reflectPercent.y; r8.z <- reflectPercent.z
+  88:   mov r8.xyz, -r9.xyzx
+  89:   add r8.xyz, r8.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
+  90:   mul r8.w, r7.w, r7.w
+  91:   mul r8.w, r7.w, r8.w
+  92:   mul r8.w, r7.w, r8.w
+  93:   mul r7.w, r7.w, r8.w
+  94:   mul r8.xyz, r7.wwww, r8.xyzx
+  95:   add r8.xyz, r8.xyzx, r9.xyzx  // r8.x <- reflectPercent.x; r8.y <- reflectPercent.y; r8.z <- reflectPercent.z
 
 #line 41
-  91:   mov r8.xyz, r8.xyzx  // r8.x <- <SchlickFresnel return value>.x; r8.y <- <SchlickFresnel return value>.y; r8.z <- <SchlickFresnel return value>.z
+  96:   mov r8.xyz, r8.xyzx  // r8.x <- <SchlickFresnel return value>.x; r8.y <- <SchlickFresnel return value>.y; r8.z <- <SchlickFresnel return value>.z
 
 #line 50
-  92:   mov r8.xyz, r8.xyzx  // r8.x <- fresnelFactor.x; r8.y <- fresnelFactor.y; r8.z <- fresnelFactor.z
+  97:   mov r8.xyz, r8.xyzx  // r8.x <- fresnelFactor.x; r8.y <- fresnelFactor.y; r8.z <- fresnelFactor.z
 
 #line 52
-  93:   mul r8.xyz, r6.wwww, r8.xyzx  // r8.x <- specAlbedo.x; r8.y <- specAlbedo.y; r8.z <- specAlbedo.z
+  98:   mul r8.xyz, r6.wwww, r8.xyzx  // r8.x <- specAlbedo.x; r8.y <- specAlbedo.y; r8.z <- specAlbedo.z
 
 #line 56
-  94:   add r9.xyz, r8.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
-  95:   div r8.xyz, r8.xyzx, r9.xyzx
+  99:   add r9.xyz, r8.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
+ 100:   div r8.xyz, r8.xyzx, r9.xyzx
 
 #line 58
-  96:   add r8.xyz, r8.xyzx, r10.xyzx
-  97:   mul r7.xyz, r7.xyzx, r8.xyzx  // r7.x <- <BlinnPhong return value>.x; r7.y <- <BlinnPhong return value>.y; r7.z <- <BlinnPhong return value>.z
+ 101:   add r8.xyz, r8.xyzx, r10.xyzx
+ 102:   mul r7.xyz, r7.xyzx, r8.xyzx  // r7.x <- <BlinnPhong return value>.x; r7.y <- <BlinnPhong return value>.y; r7.z <- <BlinnPhong return value>.z
 
 #line 73
-  98:   mov r7.xyz, r7.xyzx  // r7.x <- <ComputeDirectionalLight return value>.x; r7.y <- <ComputeDirectionalLight return value>.y; r7.z <- <ComputeDirectionalLight return value>.z
+ 103:   mov r7.xyz, r7.xyzx  // r7.x <- <ComputeDirectionalLight return value>.x; r7.y <- <ComputeDirectionalLight return value>.y; r7.z <- <ComputeDirectionalLight return value>.z
 
 #line 149
-  99:   mul r7.xyz, r4.xxxx, r7.xyzx
- 100:   add r6.xyz, r6.xyzx, r7.xyzx
+ 104:   mul r7.xyz, r4.xxxx, r7.xyzx
+ 105:   add r6.xyz, r6.xyzx, r7.xyzx
 
 #line 150
- 101:   iadd r3.w, r3.w, l(1)
- 102: endloop 
+ 106:   iadd r3.w, r3.w, l(1)
+ 107: endloop 
 
 #line 167
- 103: mov r6.xyz, r6.xyzx  // r6.x <- <ComputeLighting return value>.x; r6.y <- <ComputeLighting return value>.y; r6.z <- <ComputeLighting return value>.z
+ 108: mov r6.xyz, r6.xyzx  // r6.x <- <ComputeLighting return value>.x; r6.y <- <ComputeLighting return value>.y; r6.z <- <ComputeLighting return value>.z
 
 #line 142 "C:\cg\DX12\Solution\Chap10\Chap10_Blend\Shaders\Default.hlsl"
- 104: mov r6.xyz, r6.xyzx  // r6.x <- directLight.x; r6.y <- directLight.y; r6.z <- directLight.z
+ 109: mov r6.xyz, r6.xyzx  // r6.x <- directLight.x; r6.y <- directLight.y; r6.z <- directLight.z
 
 #line 145
- 105: add r0.xyz, r3.xyzx, r6.xyzx  // r0.x <- litColor.x; r0.y <- litColor.y; r0.z <- litColor.z
+ 110: add r0.xyz, r3.xyzx, r6.xyzx  // r0.x <- litColor.x; r0.y <- litColor.y; r0.z <- litColor.z
 
 #line 148
- 106: mov r1.x, -cb1[29].x
- 107: add r1.x, r1.x, r1.w
- 108: div r1.x, r1.x, cb1[29].y
- 109: max r1.x, r1.x, l(0.000000)
- 110: min r1.x, r1.x, l(1.000000)  // r1.x <- fogAmount
+ 111: mov r1.x, -cb1[29].x
+ 112: add r1.x, r1.x, r1.w
+ 113: div r1.x, r1.x, cb1[29].y
+ 114: max r1.x, r1.x, l(0.000000)
+ 115: min r1.x, r1.x, l(1.000000)  // r1.x <- fogAmount
 
 #line 149
- 111: mov r1.yzw, -r0.xxyz
- 112: add r1.yzw, r1.yyzw, cb1[28].xxyz
- 113: mul r1.xyz, r1.yzwy, r1.xxxx
- 114: add r0.xyz, r0.xyzx, r1.xyzx
+ 116: mov r1.yzw, -r0.xxyz
+ 117: add r1.yzw, r1.yyzw, cb1[28].xxyz
+ 118: mul r1.xyz, r1.yzwy, r1.xxxx
+ 119: add r0.xyz, r0.xyzx, r1.xyzx
 
 #line 153
- 115: mov r0.w, r0.w  // r0.w <- litColor.w
+ 120: mov r0.w, r0.w  // r0.w <- litColor.w
 
 #line 155
- 116: mov o0.xyz, r0.xyzx
- 117: mov o0.w, r0.w
- 118: ret 
-// Approximately 119 instruction slots used
+ 121: mov o0.xyz, r0.xyzx
+ 122: mov o0.w, r0.w
+ 123: ret 
+// Approximately 124 instruction slots used
  

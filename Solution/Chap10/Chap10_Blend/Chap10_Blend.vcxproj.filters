@@ -42,7 +42,7 @@
     <ClCompile Include="..\..\..\Common\MathHelper.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Chap11\Chap11_8\Chap11_8.cpp">
+    <ClCompile Include="..\..\Chap11\Chap11_9\Chap11_9.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -20,21 +20,21 @@
 // Include structures and functions for lighting.
 #include "LightingUtil.hlsl"
 
-Texture2D    gDiffuseMap : register(t0);
+Texture2D gDiffuseMap : register(t0);
 
 
-SamplerState gsamPointWrap        : register(s0);
-SamplerState gsamPointClamp       : register(s1);
-SamplerState gsamLinearWrap       : register(s2);
-SamplerState gsamLinearClamp      : register(s3);
-SamplerState gsamAnisotropicWrap  : register(s4);
+SamplerState gsamPointWrap : register(s0);
+SamplerState gsamPointClamp : register(s1);
+SamplerState gsamLinearWrap : register(s2);
+SamplerState gsamLinearClamp : register(s3);
+SamplerState gsamAnisotropicWrap : register(s4);
 SamplerState gsamAnisotropicClamp : register(s5);
 
 // Constant data that varies per frame.
 cbuffer cbPerObject : register(b0)
 {
     float4x4 gWorld;
-	float4x4 gTexTransform;
+    float4x4 gTexTransform;
 };
 
 // Constant data that varies per pass.
@@ -58,10 +58,10 @@ cbuffer cbPass : register(b1)
 
 	// Allow application to change fog parameters once per frame.
 	// For example, we may only use fog for certain times of day.
-	float4 gFogColor;
-	float gFogStart;
-	float gFogRange;
-	float2 cbPerObjectPad2;
+    float4 gFogColor;
+    float gFogStart;
+    float gFogRange;
+    float2 cbPerObjectPad2;
 
     // Indices [0, NUM_DIR_LIGHTS) are directional lights;
     // indices [NUM_DIR_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHTS) are point lights;
@@ -72,36 +72,26 @@ cbuffer cbPass : register(b1)
 
 cbuffer cbMaterial : register(b2)
 {
-	float4   gDiffuseAlbedo;
-    float3   gFresnelR0;
-    float    gRoughness;
-	float4x4 gMatTransform;
+    float4 gDiffuseAlbedo;
+    float3 gFresnelR0;
+    float gRoughness;
+    float4x4 gMatTransform;
 };
 
-cbuffer cbRootConstants : register(b3)
-{
-    float4 gComplexityColor;
-};
-
-struct VertexOut_Visualize
-{
-    float4 PosH : SV_POSITION;
-    float2 TexC : TEXCOORD;
-};
 
 struct VertexIn
 {
-	float3 PosL    : POSITION;
+    float3 PosL : POSITION;
     float3 NormalL : NORMAL;
-	float2 TexC    : TEXCOORD;
+    float2 TexC : TEXCOORD;
 };
 
 struct VertexOut
 {
-	float4 PosH    : SV_POSITION;
-    float3 PosW    : POSITION;
+    float4 PosH : SV_POSITION;
+    float3 PosW : POSITION;
     float3 NormalW : NORMAL;
-	float2 TexC    : TEXCOORD;
+    float2 TexC : TEXCOORD;
 };
 
 struct PixelOut
@@ -110,47 +100,30 @@ struct PixelOut
     float depth : SV_Depth;
 };
 
-// ----------------------------------------------------------------
-// 1. 시각화용 정점 셰이더 (Bufferless Fullscreen Quad)
-// ----------------------------------------------------------------
-VertexOut_Visualize VisualizeVS(uint vid : SV_VertexID)
+
+float4 VisualizePS(VertexOut pin) : SV_Target
 {
-    VertexOut_Visualize vout;
-
-    // SV_VertexID를 이용한 풀스크린 사각형 좌표 생성 (정점 버퍼 필요 없음)
-    vout.TexC = float2((vid << 1) & 2, vid & 2);
-    vout.PosH = float4(vout.TexC * float2(2.0f, -2.0f) + float2(-1.0f, 1.0f), 0.0f, 1.0f);
-
-    return vout;
+    // C++의 UpdateColorConstant에서 보낸 색상을 그대로 출력 
+    return float4(0.1f, 0.1f, 0.1f, 1.0f);
 }
-
-// ----------------------------------------------------------------
-// 2. 시각화용 픽셀 셰이더
-// ----------------------------------------------------------------
-float4 VisualizePS(VertexOut_Visualize pin) : SV_Target
-{
-    // C++의 UpdateColorConstant에서 보낸 색상을 그대로 출력
-    return gComplexityColor;
-}
-
 
 VertexOut VS(VertexIn vin)
 {
-	VertexOut vout = (VertexOut)0.0f;
+    VertexOut vout = (VertexOut) 0.0f;
 	
     // Transform to world space.
     float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
     vout.PosW = posW.xyz;
 
     // Assumes nonuniform scaling; otherwise, need to use inverse-transpose of world matrix.
-    vout.NormalW = mul(vin.NormalL, (float3x3)gWorld);
+    vout.NormalW = mul(vin.NormalL, (float3x3) gWorld);
 
     // Transform to homogeneous clip space.
     vout.PosH = mul(posW, gViewProj);
 	
 	// Output vertex attributes for interpolation across triangle.
-	float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
-	vout.TexC = mul(texC, gMatTransform).xy;
+    float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
+    vout.TexC = mul(texC, gMatTransform).xy;
 
     return vout;
 }
@@ -172,12 +145,12 @@ float4 PS(VertexOut pin) : SV_Target
     pin.NormalW = normalize(pin.NormalW);
 
     // Vector from point being lit to eye. 
-	float3 toEyeW = gEyePosW - pin.PosW;
-	float distToEye = length(toEyeW);
-	toEyeW /= distToEye; // normalize
+    float3 toEyeW = gEyePosW - pin.PosW;
+    float distToEye = length(toEyeW);
+    toEyeW /= distToEye; // normalize
 
     // Light terms.
-    float4 ambient = gAmbientLight*diffuseAlbedo;
+    float4 ambient = gAmbientLight * diffuseAlbedo;
 
     const float shininess = 1.0f - gRoughness;
     Material mat = { diffuseAlbedo, gFresnelR0, shininess };
