@@ -426,7 +426,7 @@ void StencilApp::OnKeyboardInput(const GameTimer& gt)
 	XMVECTOR toMainLight = -XMLoadFloat3(&mMainPassCB.Lights[0].Direction);
 	XMMATRIX S = XMMatrixShadow(shadowPlane, toMainLight);
 	XMMATRIX shadowOffsetY = XMMatrixTranslation(0.0f, 0.001f, 0.0f);
-	XMStoreFloat4x4(&mShadowedSkullRitem->World, skullWorld * S /* * shadowOffsetY*/);
+	XMStoreFloat4x4(&mShadowedSkullRitem->World, skullWorld * S);//* shadowOffsetY);
 
 
 	mSkullRitem->NumFramesDirty = gNumFrameResources;

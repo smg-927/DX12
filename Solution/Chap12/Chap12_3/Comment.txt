@@ -1,0 +1,5 @@
+CBPass구조를 변경하였으므로 별도의 FrameResource.h사용
+
+===============================================
+
+“Since the CBPass structure has been modified, a separate FrameResource.h is used.”

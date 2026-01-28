@@ -26,7 +26,7 @@
     <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\Common\MathHelper.cpp" />
-    <ClCompile Include="..\Chap11_5\Chap11_5.cpp" />
+    <ClCompile Include="..\Chap11_8\Chap11_8.cpp" />
     <ClCompile Include="FrameResource.cpp" />
   </ItemGroup>
   <ItemGroup>

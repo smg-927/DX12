@@ -99,7 +99,7 @@
 //   v3.x <- pin.TexC.x; v3.y <- pin.TexC.y; 
 //   o0.x <- <PS return value>.x; o0.y <- <PS return value>.y; o0.z <- <PS return value>.z; o0.w <- <PS return value>.w
 //
-#line 117 "C:\cg\DX12\Solution\Chap11\Chap11_11\Shaders\Default.hlsl"
+#line 117 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap11\Chap11_11\Shaders\Default.hlsl"
    0: sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.xyzw, s4
    1: mul r0.xyzw, r0.xyzw, cb2[0].xyzw  // r0.x <- diffuseAlbedo.x; r0.y <- diffuseAlbedo.y; r0.z <- diffuseAlbedo.z; r0.w <- diffuseAlbedo.w
 
@@ -274,7 +274,7 @@
 #line 167
  108: mov r6.xyz, r6.xyzx  // r6.x <- <ComputeLighting return value>.x; r6.y <- <ComputeLighting return value>.y; r6.z <- <ComputeLighting return value>.z
 
-#line 140 "C:\cg\DX12\Solution\Chap11\Chap11_11\Shaders\Default.hlsl"
+#line 140 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap11\Chap11_11\Shaders\Default.hlsl"
  109: mov r6.xyz, r6.xyzx  // r6.x <- directLight.x; r6.y <- directLight.y; r6.z <- directLight.z
 
 #line 143

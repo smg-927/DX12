@@ -130,6 +130,13 @@ VertexOut_Visualize VisualizeVS(uint vid : SV_VertexID)
 float4 VisualizePS(VertexOut_Visualize pin) : SV_Target
 {
     // C++의 UpdateColorConstant에서 보낸 색상을 그대로 출력
+    #ifdef ALPHA_TEST
+	// Discard pixel if texture alpha < 0.1.  We do this test as soon 
+	// as possible in the shader so that we can potentially exit the
+	// shader early, thereby skipping the rest of the shader code.
+	clip(diffuseAlbedo.a - 0.1f);
+    #endif
+    
     return gComplexityColor;
 }
 
