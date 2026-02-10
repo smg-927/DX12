@@ -77,7 +77,7 @@
     <ClCompile Include="Waves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Chap12_7\Chap12_7.cpp">
+    <ClCompile Include="..\Chap12_2\Chap12_2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

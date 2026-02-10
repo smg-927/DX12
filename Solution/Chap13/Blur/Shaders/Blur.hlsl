@@ -1,32 +1,30 @@
 //=============================================================================
-// Performs a separable Guassian blur with a blur radius up to 5 pixels.
+// Performs a separable Gaussian blur with a blur radius up to 5 pixels.
+// Safe version: does NOT use Texture2D.Length (uses GetDimensions instead).
 //=============================================================================
 
 cbuffer cbSettings : register(b0)
 {
-	// We cannot have an array entry in a constant buffer that gets mapped onto
-	// root constants, so list each element.  
-	
-	int gBlurRadius;
+    int gBlurRadius;
 
-	// Support up to 11 blur weights.
-	float w0;
-	float w1;
-	float w2;
-	float w3;
-	float w4;
-	float w5;
-	float w6;
-	float w7;
-	float w8;
-	float w9;
-	float w10;
+    // Support up to 11 blur weights.
+    float w0;
+    float w1;
+    float w2;
+    float w3;
+    float w4;
+    float w5;
+    float w6;
+    float w7;
+    float w8;
+    float w9;
+    float w10;
 };
 
 static const int gMaxBlurRadius = 5;
 
-
-Texture2D gInput            : register(t0);
+// 명시 타입 권장 (원본처럼 untyped Texture2D도 되지만, 안전/명확성 위해 float4로)
+Texture2D<float4> gInput : register(t0);
 RWTexture2D<float4> gOutput : register(u0);
 
 #define N 256
@@ -34,102 +32,143 @@ RWTexture2D<float4> gOutput : register(u0);
 groupshared float4 gCache[CacheSize];
 
 [numthreads(N, 1, 1)]
-void HorzBlurCS(int3 groupThreadID : SV_GroupThreadID,
-				int3 dispatchThreadID : SV_DispatchThreadID)
+void HorzBlurCS(uint3 groupThreadID : SV_GroupThreadID,
+                uint3 dispatchThreadID : SV_DispatchThreadID)
 {
-	// Put in an array for each indexing.
-	float weights[11] = { w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 };
+    // Clamp blur radius to max to avoid out-of-bounds in gCache / weights indexing.
+    int radius = min(gBlurRadius, gMaxBlurRadius);
 
-	//
-	// Fill local thread storage to reduce bandwidth.  To blur 
-	// N pixels, we will need to load N + 2*BlurRadius pixels
-	// due to the blur radius.
-	//
-	
-	// This thread group runs N threads.  To get the extra 2*BlurRadius pixels, 
-	// have 2*BlurRadius threads sample an extra pixel.
-	if(groupThreadID.x < gBlurRadius)
-	{
-		// Clamp out of bound samples that occur at image borders.
-		int x = max(dispatchThreadID.x - gBlurRadius, 0);
-		gCache[groupThreadID.x] = gInput[int2(x, dispatchThreadID.y)];
-	}
-	if(groupThreadID.x >= N-gBlurRadius)
-	{
-		// Clamp out of bound samples that occur at image borders.
-		int x = min(dispatchThreadID.x + gBlurRadius, gInput.Length.x-1);
-		gCache[groupThreadID.x+2*gBlurRadius] = gInput[int2(x, dispatchThreadID.y)];
-	}
+    // Put in an array for each indexing.
+    float weights[11] = { w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 };
 
-	// Clamp out of bound samples that occur at image borders.
-	gCache[groupThreadID.x+gBlurRadius] = gInput[min(dispatchThreadID.xy, gInput.Length.xy-1)];
+    // Fetch texture dimensions.
+    uint texW, texH;
+    gInput.GetDimensions(texW, texH);
 
-	// Wait for all threads to finish.
-	GroupMemoryBarrierWithGroupSync();
-	
-	//
-	// Now blur each pixel.
-	//
+    // Convert frequently used ids to int for safe math.
+    int gx = (int) groupThreadID.x;
+    int dx = (int) dispatchThreadID.x;
+    int dy = (int) dispatchThreadID.y;
 
-	float4 blurColor = float4(0, 0, 0, 0);
-	
-	for(int i = -gBlurRadius; i <= gBlurRadius; ++i)
-	{
-		int k = groupThreadID.x + gBlurRadius + i;
-		
-		blurColor += weights[i+gBlurRadius]*gCache[k];
-	}
-	
-	gOutput[dispatchThreadID.xy] = blurColor;
+    int maxX = (int) texW - 1;
+    int maxY = (int) texH - 1;
+
+    // Guard: if height is 0 (shouldn't happen), avoid negative maxY.
+    // (Optional safety; can omit if guaranteed valid texture)
+    if (maxX < 0 || maxY < 0)
+        return;
+
+    // This thread group runs N threads. To get the extra 2*radius pixels,
+    // have 2*radius threads sample an extra pixel.
+    if (gx < radius)
+    {
+        int x = max(dx - radius, 0);
+        int y = min(max(dy, 0), maxY);
+        gCache[gx] = gInput[int2(x, y)];
+    }
+
+    if (gx >= N - radius)
+    {
+        int x = min(dx + radius, maxX);
+        int y = min(max(dy, 0), maxY);
+        gCache[gx + 2 * radius] = gInput[int2(x, y)];
+    }
+
+    // Load the central pixel for this thread.
+    {
+        int x = min(max(dx, 0), maxX);
+        int y = min(max(dy, 0), maxY);
+        gCache[gx + radius] = gInput[int2(x, y)];
+    }
+
+    // Wait for all threads to finish filling gCache.
+    GroupMemoryBarrierWithGroupSync();
+
+    // Now blur each pixel.
+    float4 blurColor = float4(0, 0, 0, 0);
+
+    // Cache index for this thread's center.
+    int centerK = gx + radius;
+
+    [unroll]
+    for (int i = -gMaxBlurRadius; i <= gMaxBlurRadius; ++i)
+    {
+        if (i < -radius || i > radius)
+            continue; // only active taps
+
+        int k = centerK + i;
+        blurColor += weights[i + gMaxBlurRadius] * gCache[k];
+    }
+
+    // Write output (clamp write coords too)
+    {
+        int x = min(max(dx, 0), maxX);
+        int y = min(max(dy, 0), maxY);
+        gOutput[int2(x, y)] = blurColor;
+    }
 }
 
 [numthreads(1, N, 1)]
-void VertBlurCS(int3 groupThreadID : SV_GroupThreadID,
-				int3 dispatchThreadID : SV_DispatchThreadID)
+void VertBlurCS(uint3 groupThreadID : SV_GroupThreadID,
+                uint3 dispatchThreadID : SV_DispatchThreadID)
 {
-	// Put in an array for each indexing.
-	float weights[11] = { w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 };
+    int radius = min(gBlurRadius, gMaxBlurRadius);
 
-	//
-	// Fill local thread storage to reduce bandwidth.  To blur 
-	// N pixels, we will need to load N + 2*BlurRadius pixels
-	// due to the blur radius.
-	//
-	
-	// This thread group runs N threads.  To get the extra 2*BlurRadius pixels, 
-	// have 2*BlurRadius threads sample an extra pixel.
-	if(groupThreadID.y < gBlurRadius)
-	{
-		// Clamp out of bound samples that occur at image borders.
-		int y = max(dispatchThreadID.y - gBlurRadius, 0);
-		gCache[groupThreadID.y] = gInput[int2(dispatchThreadID.x, y)];
-	}
-	if(groupThreadID.y >= N-gBlurRadius)
-	{
-		// Clamp out of bound samples that occur at image borders.
-		int y = min(dispatchThreadID.y + gBlurRadius, gInput.Length.y-1);
-		gCache[groupThreadID.y+2*gBlurRadius] = gInput[int2(dispatchThreadID.x, y)];
-	}
-	
-	// Clamp out of bound samples that occur at image borders.
-	gCache[groupThreadID.y+gBlurRadius] = gInput[min(dispatchThreadID.xy, gInput.Length.xy-1)];
+    float weights[11] = { w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 };
 
+    uint texW, texH;
+    gInput.GetDimensions(texW, texH);
 
-	// Wait for all threads to finish.
-	GroupMemoryBarrierWithGroupSync();
-	
-	//
-	// Now blur each pixel.
-	//
+    int gy = (int) groupThreadID.y;
+    int dx = (int) dispatchThreadID.x;
+    int dy = (int) dispatchThreadID.y;
 
-	float4 blurColor = float4(0, 0, 0, 0);
-	
-	for(int i = -gBlurRadius; i <= gBlurRadius; ++i)
-	{
-		int k = groupThreadID.y + gBlurRadius + i;
-		
-		blurColor += weights[i+gBlurRadius]*gCache[k];
-	}
-	
-	gOutput[dispatchThreadID.xy] = blurColor;
+    int maxX = (int) texW - 1;
+    int maxY = (int) texH - 1;
+
+    if (maxX < 0 || maxY < 0)
+        return;
+
+    if (gy < radius)
+    {
+        int y = max(dy - radius, 0);
+        int x = min(max(dx, 0), maxX);
+        gCache[gy] = gInput[int2(x, y)];
+    }
+
+    if (gy >= N - radius)
+    {
+        int y = min(dy + radius, maxY);
+        int x = min(max(dx, 0), maxX);
+        gCache[gy + 2 * radius] = gInput[int2(x, y)];
+    }
+
+    // Central pixel
+    {
+        int x = min(max(dx, 0), maxX);
+        int y = min(max(dy, 0), maxY);
+        gCache[gy + radius] = gInput[int2(x, y)];
+    }
+
+    GroupMemoryBarrierWithGroupSync();
+
+    float4 blurColor = float4(0, 0, 0, 0);
+    int centerK = gy + radius;
+
+    [unroll]
+    for (int i = -gMaxBlurRadius; i <= gMaxBlurRadius; ++i)
+    {
+        if (i < -radius || i > radius)
+            continue;
+
+        int k = centerK + i;
+        blurColor += weights[i + gMaxBlurRadius] * gCache[k];
+    }
+
+    // Write output
+    {
+        int x = min(max(dx, 0), maxX);
+        int y = min(max(dy, 0), maxY);
+        gOutput[int2(x, y)] = blurColor;
+    }
 }
