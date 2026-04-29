@@ -14,7 +14,7 @@
 //   float4x4 gViewProj;                // Offset:  256 Size:    64 [unused]
 //   float4x4 gInvViewProj;             // Offset:  320 Size:    64 [unused]
 //   float3 gEyePosW;                   // Offset:  384 Size:    12
-//   float cbPerObjectPad1;             // Offset:  396 Size:     4 [unused]
+//   float cbPerPassPad1;               // Offset:  396 Size:     4 [unused]
 //   float2 gRenderTargetSize;          // Offset:  400 Size:     8 [unused]
 //   float2 gInvRenderTargetSize;       // Offset:  408 Size:     8 [unused]
 //   float gNearZ;                      // Offset:  416 Size:     4 [unused]
@@ -25,7 +25,7 @@
 //   float4 gFogColor;                  // Offset:  448 Size:    16
 //   float gFogStart;                   // Offset:  464 Size:     4
 //   float gFogRange;                   // Offset:  468 Size:     4
-//   float2 cbPerObjectPad2;            // Offset:  472 Size:     8 [unused]
+//   float2 cbPerPassPad2;              // Offset:  472 Size:     8 [unused]
 //   
 //   struct Light
 //   {
@@ -99,47 +99,47 @@
 //   v3.x <- pin.TexC.x; v3.y <- pin.TexC.y; 
 //   o0.x <- <PS return value>.x; o0.y <- <PS return value>.y; o0.z <- <PS return value>.z; o0.w <- <PS return value>.w
 //
-#line 117 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap13\Chap13_Solution\Chap13_4\Shaders\Default.hlsl"
+#line 137 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap13\Chap13_solution\Chap13_6\Shaders\Default.hlsl"
    0: sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.xyzw, s4
    1: mul r0.xyzw, r0.xyzw, cb2[0].xyzw  // r0.x <- diffuseAlbedo.x; r0.y <- diffuseAlbedo.y; r0.z <- diffuseAlbedo.z; r0.w <- diffuseAlbedo.w
 
-#line 123
+#line 143
    2: mov r1.x, l(-0.100000)
    3: add r1.x, r0.w, r1.x
    4: lt r1.x, r1.x, l(0.000000)
    5: and r1.x, r1.x, l(-1)
    6: discard_nz r1.x
 
-#line 127
+#line 147
    7: dp3 r1.x, v2.xyzx, v2.xyzx
    8: rsq r1.x, r1.x
    9: mul r1.xyz, r1.xxxx, v2.xyzx  // r1.x <- pin.NormalW.x; r1.y <- pin.NormalW.y; r1.z <- pin.NormalW.z
 
-#line 130
+#line 150
   10: mov r2.xyz, -v1.xyzx
   11: add r2.xyz, r2.xyzx, cb1[24].xyzx  // r2.x <- toEyeW.x; r2.y <- toEyeW.y; r2.z <- toEyeW.z
 
-#line 131
+#line 151
   12: dp3 r1.w, r2.xyzx, r2.xyzx
   13: sqrt r1.w, r1.w  // r1.w <- distToEye
 
-#line 132
+#line 152
   14: div r2.xyz, r2.xyzx, r1.wwww
 
-#line 135
+#line 155
   15: mul r3.xyz, r0.xyzx, cb1[27].xyzx  // r3.x <- ambient.x; r3.y <- ambient.y; r3.z <- ambient.z
 
-#line 137
+#line 157
   16: mov r2.w, -cb2[1].w
   17: add r4.w, r2.w, l(1.000000)  // r4.w <- shininess
 
-#line 138
+#line 158
   18: mov r5.xyz, r0.xyzx  // r5.x <- mat.DiffuseAlbedo.x; r5.y <- mat.DiffuseAlbedo.y; r5.z <- mat.DiffuseAlbedo.z
   19: mov r5.w, cb2[1].x  // r5.w <- mat.FresnelR0.x
   20: mov r4.yz, cb2[1].yyzy  // r4.y <- mat.FresnelR0.y; r4.z <- mat.FresnelR0.z
   21: mov r4.w, r4.w  // r4.w <- mat.Shininess
 
-#line 140
+#line 160
   22: nop 
   23: mov x0[0].xyz, cb1[30].xyzx
   24: mov x0[2].xyz, cb1[31].xyzx
@@ -274,29 +274,29 @@
 #line 167
  108: mov r6.xyz, r6.xyzx  // r6.x <- <ComputeLighting return value>.x; r6.y <- <ComputeLighting return value>.y; r6.z <- <ComputeLighting return value>.z
 
-#line 140 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap13\Chap13_Solution\Chap13_4\Shaders\Default.hlsl"
+#line 160 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap13\Chap13_solution\Chap13_6\Shaders\Default.hlsl"
  109: mov r6.xyz, r6.xyzx  // r6.x <- directLight.x; r6.y <- directLight.y; r6.z <- directLight.z
 
-#line 143
+#line 163
  110: add r0.xyz, r3.xyzx, r6.xyzx  // r0.x <- litColor.x; r0.y <- litColor.y; r0.z <- litColor.z
 
-#line 146
+#line 166
  111: mov r1.x, -cb1[29].x
  112: add r1.x, r1.x, r1.w
  113: div r1.x, r1.x, cb1[29].y
  114: max r1.x, r1.x, l(0.000000)
  115: min r1.x, r1.x, l(1.000000)  // r1.x <- fogAmount
 
-#line 147
+#line 167
  116: mov r1.yzw, -r0.xxyz
  117: add r1.yzw, r1.yyzw, cb1[28].xxyz
  118: mul r1.xyz, r1.yzwy, r1.xxxx
  119: add r0.xyz, r0.xyzx, r1.xyzx
 
-#line 151
+#line 171
  120: mov r0.w, r0.w  // r0.w <- litColor.w
 
-#line 153
+#line 173
  121: mov o0.xyz, r0.xyzx
  122: mov o0.w, r0.w
  123: ret 

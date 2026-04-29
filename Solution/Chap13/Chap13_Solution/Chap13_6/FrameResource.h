@@ -8,6 +8,9 @@ struct ObjectConstants
 {
     DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
+	DirectX::XMFLOAT2 DisplacementMapTexelSize = { 1.0f, 1.0f };
+	float GridSpatialStep = 1.0f;
+	float Pad;
 };
 
 struct PassConstants
@@ -43,12 +46,6 @@ struct PassConstants
 
 struct Vertex
 {
-	Vertex() = default;
-	Vertex(float x, float y, float z, float nx, float ny, float nz, float u, float v) :
-		Pos(x, y, z),
-		Normal(nx, ny, nz),
-		TexC(u, v) {}
-
     DirectX::XMFLOAT3 Pos;
     DirectX::XMFLOAT3 Normal;
 	DirectX::XMFLOAT2 TexC;

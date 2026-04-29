@@ -199,7 +199,7 @@ bool BlurApp::Initialize()
 	// so we have to query this information.
 	mCbvSrvUavDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	mWaves = std::make_unique<Waves>(128, 128, 1.0f, 0.03f, 4.0f, 0.2f);
+	mWaves = std::make_unique<Waves>(512, 512, 0.5f, 0.03f, 3.25f, 0.4f);
 
 	mBlurFilter = std::make_unique<BlurFilter>(md3dDevice.Get(),
 		mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
@@ -336,6 +336,7 @@ void BlurApp::Draw(const GameTimer& gt)
 	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
 	// Swap the back and front buffers
+
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
@@ -762,7 +763,7 @@ void BlurApp::BuildShadersAndInputLayout()
 void BlurApp::BuildLandGeometry()
 {
 	GeometryGenerator geoGen;
-	GeometryGenerator::MeshData grid = geoGen.CreateGrid(160.0f, 160.0f, 50, 50);
+	GeometryGenerator::MeshData grid = geoGen.CreateGrid(160.0f, 160.0f, 50,50);
 
 	//
 	// Extract the vertex elements we are interested and apply the height function to
@@ -817,8 +818,8 @@ void BlurApp::BuildLandGeometry()
 
 void BlurApp::BuildWavesGeometry()
 {
-	std::vector<std::uint16_t> indices(3 * mWaves->TriangleCount()); // 3 indices per face
-	assert(mWaves->VertexCount() < 0x0000ffff);
+	std::vector<std::uint32_t> indices(3 * mWaves->TriangleCount()); // 3 indices per face
+	assert(mWaves->VertexCount() < 0xffffffff);
 
 	// Iterate over each quad.
 	int m = mWaves->RowCount();
@@ -841,8 +842,8 @@ void BlurApp::BuildWavesGeometry()
 	}
 
 	UINT vbByteSize = mWaves->VertexCount() * sizeof(Vertex);
-	UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
-
+	UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint32_t);
+	
 	auto geo = std::make_unique<MeshGeometry>();
 	geo->Name = "waterGeo";
 
@@ -858,7 +859,7 @@ void BlurApp::BuildWavesGeometry()
 
 	geo->VertexByteStride = sizeof(Vertex);
 	geo->VertexBufferByteSize = vbByteSize;
-	geo->IndexFormat = DXGI_FORMAT_R16_UINT;
+	geo->IndexFormat = DXGI_FORMAT_R32_UINT;
 	geo->IndexBufferByteSize = ibByteSize;
 
 	SubmeshGeometry submesh;

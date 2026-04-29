@@ -52,7 +52,7 @@
 //   vThreadID.x <- dispatchThreadID.x; vThreadID.y <- dispatchThreadID.y; vThreadID.z <- dispatchThreadID.z; 
 //   x0 <- weights
 //
-#line 8 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap13\Chap13_solution\Chap13_4\Shaders\Blur.hlsl"
+#line 8 "C:\1.task\5.DirextX12\DX12_practice\Solution\Chap13\Chap13_Solution\Chap13_4\Shaders\Blur.hlsl"
    0: mov r0.x, l(3)  // r0.x <- gMaxBlurRadius
 
 #line 38

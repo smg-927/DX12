@@ -269,9 +269,6 @@ void WavesCSApp::Draw(const GameTimer& gt)
     // Reuse the memory associated with command recording.
     // We can only reset when the associated command lists have finished execution on the GPU.
     ThrowIfFailed(cmdListAlloc->Reset());
-
-    // A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-    // Reusing the command list reuses memory.
     ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { mSrvDescriptorHeap.Get() };
@@ -652,7 +649,6 @@ void WavesCSApp::BuildWavesRootSignature()
 void WavesCSApp::BuildDescriptorHeaps()
 {
 	UINT srvCount = 3;
-
 	//
 	// Create the SRV heap.
 	//
