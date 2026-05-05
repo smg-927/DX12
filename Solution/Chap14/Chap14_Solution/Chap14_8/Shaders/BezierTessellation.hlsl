@@ -4,6 +4,17 @@
 // Demonstrates hardware tessellating a Bezier patch.
 //***************************************************************************************
 
+#ifndef NUM_DIR_LIGHTS
+    #define NUM_DIR_LIGHTS 3
+#endif
+
+#ifndef NUM_POINT_LIGHTS
+    #define NUM_POINT_LIGHTS 0
+#endif
+
+#ifndef NUM_SPOT_LIGHTS
+    #define NUM_SPOT_LIGHTS 0
+#endif
 
  // Include structures and functions for lighting.
 #include "LightingUtil.hlsl"
@@ -77,12 +88,12 @@ struct VertexOut
 VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
-	
+
 	vout.PosL = vin.PosL;
 
 	return vout;
 }
- 
+
 struct PatchTess
 {
 	float EdgeTess[4]   : SV_TessFactor;
@@ -92,17 +103,17 @@ struct PatchTess
 PatchTess ConstantHS(InputPatch<VertexOut, 16> patch, uint patchID : SV_PrimitiveID)
 {
 	PatchTess pt;
-	
+
 	// Uniform tessellation for this demo.
 
 	pt.EdgeTess[0] = 25;
 	pt.EdgeTess[1] = 25;
 	pt.EdgeTess[2] = 25;
 	pt.EdgeTess[3] = 25;
-	
+
 	pt.InsideTess[0] = 25;
 	pt.InsideTess[1] = 25;
-	
+
 	return pt;
 }
 
@@ -111,7 +122,7 @@ struct HullOut
 	float3 PosL : POSITION;
 };
 
-// This Hull Shader part is commonly used for a coordinate basis change, 
+// This Hull Shader part is commonly used for a coordinate basis change,
 // for example changing from a quad to a Bezier bi-cubic.
 [domain("quad")]
 [partitioning("integer")]
@@ -119,20 +130,22 @@ struct HullOut
 [outputcontrolpoints(16)]
 [patchconstantfunc("ConstantHS")]
 [maxtessfactor(64.0f)]
-HullOut HS(InputPatch<VertexOut, 16> p, 
+HullOut HS(InputPatch<VertexOut, 16> p,
            uint i : SV_OutputControlPointID,
            uint patchId : SV_PrimitiveID)
 {
 	HullOut hout;
-	
+
 	hout.PosL = p[i].PosL;
-	
+
 	return hout;
 }
 
 struct DomainOut
 {
-	float4 PosH : SV_POSITION;
+	float4 PosH    : SV_POSITION;
+	float3 PosW    : POSITION;
+	float3 NormalW : NORMAL;
 };
 
 float4 BernsteinBasis(float t)
@@ -143,6 +156,16 @@ float4 BernsteinBasis(float t)
                    3.0f * t * invT * invT,
                    3.0f * t * t * invT,
                    t * t * t );
+}
+
+float4 dBernsteinBasis(float t)
+{
+    float invT = 1.0f - t;
+
+    return float4( -3 * invT * invT,
+                   3 * invT * invT - 6 * t * invT,
+                   6 * t * invT - 3 * t * t,
+                   3 * t * t );
 }
 
 float3 CubicBezierSum(const OutputPatch<HullOut, 16> bezpatch, float4 basisU, float4 basisV)
@@ -156,37 +179,50 @@ float3 CubicBezierSum(const OutputPatch<HullOut, 16> bezpatch, float4 basisU, fl
     return sum;
 }
 
-float4 dBernsteinBasis(float t)
-{
-    float invT = 1.0f - t;
-
-    return float4( -3 * invT * invT,
-                   3 * invT * invT - 6 * t * invT,
-                   6 * t * invT - 3 * t * t,
-                   3 * t * t );
-}
-
-// The domain shader is called for every vertex created by the tessellator.  
+// The domain shader is called for every vertex created by the tessellator.
 // It is like the vertex shader after tessellation.
 [domain("quad")]
-DomainOut DS(PatchTess patchTess, 
-             float2 uv : SV_DomainLocation, 
+DomainOut DS(PatchTess patchTess,
+             float2 uv : SV_DomainLocation,
              const OutputPatch<HullOut, 16> bezPatch)
 {
 	DomainOut dout;
-	
-	float4 basisU = BernsteinBasis(uv.x);
-	float4 basisV = BernsteinBasis(uv.y);
 
-	float3 p  = CubicBezierSum(bezPatch, basisU, basisV);
+	float4 basisU  = BernsteinBasis(uv.x);
+	float4 basisV  = BernsteinBasis(uv.y);
+	float4 dbasisU = dBernsteinBasis(uv.x);
+	float4 dbasisV = dBernsteinBasis(uv.y);
 
-	float4 posW = mul(float4(p, 1.0f), gWorld);
-	dout.PosH = mul(posW, gViewProj);
+	float3 p    = CubicBezierSum(bezPatch, basisU,  basisV);
+	float3 dpdu = CubicBezierSum(bezPatch, dbasisU, basisV);  // u 방향 접선
+	float3 dpdv = CubicBezierSum(bezPatch, basisU,  dbasisV); // v 방향 접선
+
+	float3 normal = normalize(cross(dpdu, dpdv));
+
+	float4 posW  = mul(float4(p, 1.0f), gWorld);
+	dout.PosH    = mul(posW, gViewProj);
+	dout.PosW    = posW.xyz;
+	dout.NormalW = mul(normal, (float3x3)gWorld);
 
 	return dout;
 }
 
 float4 PS(DomainOut pin) : SV_Target
 {
-    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	pin.NormalW = normalize(pin.NormalW);
+
+	float3 toEye = normalize(gEyePosW - pin.PosW);
+
+	float4 ambient = gAmbientLight * gDiffuseAlbedo;
+
+	const float shininess = 1.0f - gRoughness;
+	Material mat = { gDiffuseAlbedo, gFresnelR0, shininess };
+	float3 shadowFactor = 1.0f;
+	float4 directLight = ComputeLighting(gLights, mat, pin.PosW,
+		pin.NormalW, toEye, shadowFactor);
+
+	float4 litColor = ambient + directLight;
+	litColor.a = gDiffuseAlbedo.a;
+
+	return litColor;
 }

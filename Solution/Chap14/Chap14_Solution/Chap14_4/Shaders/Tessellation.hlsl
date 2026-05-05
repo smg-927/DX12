@@ -108,7 +108,7 @@ PatchTess ConstantHS(InputPatch<VertexOut, 4> patch, uint patchID : SV_Primitive
     pt.EdgeTess[0] = tess;
 	pt.EdgeTess[1] = tess;
 	pt.EdgeTess[2] = tess;
-	pt.EdgeTess[3] = tess;
+    pt.EdgeTess[3] = tess;
 	
 	pt.InsideTess[0] = tess;
     pt.InsideTess[1] = tess;
@@ -122,7 +122,7 @@ struct HullOut
 };
 
 [domain("quad")]
-[partitioning("integer")]
+[partitioning("fractional_even")]
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("ConstantHS")]

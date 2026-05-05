@@ -105,10 +105,10 @@ PatchTess ConstantHS(InputPatch<VertexOut, 4> patch, uint patchID : SV_Primitive
 
 	// Uniformly tessellate the patch.
 
-    pt.EdgeTess[0] = tess;
-	pt.EdgeTess[1] = tess;
-	pt.EdgeTess[2] = tess;
-	pt.EdgeTess[3] = tess;
+    pt.EdgeTess[0] = 1;
+	pt.EdgeTess[1] = 1;
+	pt.EdgeTess[2] = 1;
+    pt.EdgeTess[3] = 1;
 	
 	pt.InsideTess[0] = tess;
     pt.InsideTess[1] = tess;

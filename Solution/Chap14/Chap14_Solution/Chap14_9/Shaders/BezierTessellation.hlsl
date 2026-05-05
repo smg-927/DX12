@@ -1,12 +1,15 @@
 //***************************************************************************************
-// Tessellation.hlsl by Frank Luna (C) 2015 All Rights Reserved.
+// BezierTessellation.hlsl by Frank Luna (C) 2015 All Rights Reserved.
+//
+// Demonstrates hardware tessellating a cubic Bezier triangle patch (10 control points).
 //***************************************************************************************
 
 
-// Include structures and functions for lighting.
+ // Include structures and functions for lighting.
 #include "LightingUtil.hlsl"
 
 Texture2D    gDiffuseMap : register(t0);
+
 
 SamplerState gsamPointWrap        : register(s0);
 SamplerState gsamPointClamp       : register(s1);
@@ -74,45 +77,28 @@ struct VertexOut
 VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
-	
+
 	vout.PosL = vin.PosL;
 
 	return vout;
 }
- 
+
 struct PatchTess
 {
-	float EdgeTess[4]   : SV_TessFactor;
-	float InsideTess[2] : SV_InsideTessFactor;
+	float EdgeTess[3]   : SV_TessFactor;
+	float InsideTess[1] : SV_InsideTessFactor;
 };
 
-PatchTess ConstantHS(InputPatch<VertexOut, 4> patch, uint patchID : SV_PrimitiveID)
+PatchTess ConstantHS(InputPatch<VertexOut, 10> patch, uint patchID : SV_PrimitiveID)
 {
 	PatchTess pt;
-	
-	float3 centerL = 0.25f*(patch[0].PosL + patch[1].PosL + patch[2].PosL + patch[3].PosL);
-	float3 centerW = mul(float4(centerL, 1.0f), gWorld).xyz;
-	
-	float d = distance(centerW, gEyePosW);
 
-	// Tessellate the patch based on distance from the eye such that
-	// the tessellation is 0 if d >= d1 and 64 if d <= d0.  The interval
-	// [d0, d1] defines the range we tessellate in.
-	
-	const float d0 = 20.0f;
-	const float d1 = 100.0f;
-	float tess = 64.0f*saturate( (d1-d)/(d1-d0) );
+	pt.EdgeTess[0] = 25;
+	pt.EdgeTess[1] = 25;
+	pt.EdgeTess[2] = 25;
 
-	// Uniformly tessellate the patch.
+	pt.InsideTess[0] = 25;
 
-    pt.EdgeTess[0] = tess;
-	pt.EdgeTess[1] = tess;
-	pt.EdgeTess[2] = tess;
-	pt.EdgeTess[3] = tess;
-	
-	pt.InsideTess[0] = tess;
-    pt.InsideTess[1] = tess;
-	
 	return pt;
 }
 
@@ -121,20 +107,20 @@ struct HullOut
 	float3 PosL : POSITION;
 };
 
-[domain("quad")]
+[domain("tri")]
 [partitioning("integer")]
 [outputtopology("triangle_cw")]
-[outputcontrolpoints(4)]
+[outputcontrolpoints(10)]
 [patchconstantfunc("ConstantHS")]
 [maxtessfactor(64.0f)]
-HullOut HS(InputPatch<VertexOut, 4> p, 
+HullOut HS(InputPatch<VertexOut, 10> p,
            uint i : SV_OutputControlPointID,
            uint patchId : SV_PrimitiveID)
 {
 	HullOut hout;
-	
+
 	hout.PosL = p[i].PosL;
-	
+
 	return hout;
 }
 
@@ -143,26 +129,45 @@ struct DomainOut
 	float4 PosH : SV_POSITION;
 };
 
-// The domain shader is called for every vertex created by the tessellator.  
-// It is like the vertex shader after tessellation.
-[domain("quad")]
-DomainOut DS(PatchTess patchTess, 
-             float2 uv : SV_DomainLocation, 
-             const OutputPatch<HullOut, 4> quad)
+// Cubic triangular Bezier surface.
+// Control points indexed as:
+//   [0]=P300, [1]=P030, [2]=P003   (corners)
+//   [3]=P210, [4]=P120             (edge 0-1)
+//   [5]=P021, [6]=P012             (edge 1-2)
+//   [7]=P102, [8]=P201             (edge 0-2)
+//   [9]=P111                       (interior)
+// Formula: sum of C(3;i,j,k)*u^i*v^j*w^k * P_ijk, i+j+k=3
+float3 CubicBezierTriangle(const OutputPatch<HullOut, 10> patch, float3 uvw)
+{
+	float u = uvw.x;
+	float v = uvw.y;
+	float w = uvw.z;
+
+	return patch[0].PosL * (u*u*u)
+	     + patch[1].PosL * (v*v*v)
+	     + patch[2].PosL * (w*w*w)
+	     + patch[3].PosL * (3.0f * u*u*v)
+	     + patch[4].PosL * (3.0f * u*v*v)
+	     + patch[5].PosL * (3.0f * v*v*w)
+	     + patch[6].PosL * (3.0f * v*w*w)
+	     + patch[7].PosL * (3.0f * u*w*w)
+	     + patch[8].PosL * (3.0f * u*u*w)
+	     + patch[9].PosL * (6.0f * u*v*w);
+}
+
+// The domain shader is called for every vertex created by the tessellator.
+[domain("tri")]
+DomainOut DS(PatchTess patchTess,
+             float3 uvw : SV_DomainLocation,
+             const OutputPatch<HullOut, 10> bezPatch)
 {
 	DomainOut dout;
-	
-	// Bilinear interpolation.
-	float3 v1 = lerp(quad[0].PosL, quad[1].PosL, uv.x); 
-	float3 v2 = lerp(quad[2].PosL, quad[3].PosL, uv.x); 
-	float3 p  = lerp(v1, v2, uv.y); 
-	
-	// Displacement mapping
-	p.y = 0.3f*( p.z*sin(p.x) + p.x*cos(p.z) );
-	
+
+	float3 p = CubicBezierTriangle(bezPatch, uvw);
+
 	float4 posW = mul(float4(p, 1.0f), gWorld);
 	dout.PosH = mul(posW, gViewProj);
-	
+
 	return dout;
 }
 
