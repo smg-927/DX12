@@ -176,6 +176,16 @@ XMFLOAT4X4 Camera::GetProj4x4f()const
 	return mProj;
 }
 
+void Camera::Rotate(float angle)
+{
+	XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&mLook), angle);
+
+	XMStoreFloat3(&mUp, XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
+	XMStoreFloat3(&mRight, XMVector3TransformNormal(XMLoadFloat3(&mRight), R));
+
+	mViewDirty = true;
+}
+
 void Camera::Strafe(float d)
 {
 	// mPosition += d*mRight
